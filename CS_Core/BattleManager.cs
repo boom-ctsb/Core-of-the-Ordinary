@@ -1,8 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class BattleManager : MonoBehaviour
 {
+    public static event Action<BattleCharacter> OnAllyTookDamage;
+    public static event Action<BattleCharacter, SkillAction> OnAllyUsedSkill;
+
     [Header("Factory / Party")]
     [SerializeField] private CharacterFactory characterFactory;
     [SerializeField] private string selectedEnemyName = "Dysnorma";
@@ -17,7 +22,6 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private float enemyAttackChargeGain = 10f;
 
     [Header("Team Shield UI (Fixed Position)")]
-    [Tooltip("ใส่ TeamShieldUIBinder ที่วางไว้บน Empty Object ในฉาก (ตำแหน่งตายตัว)")]
     [SerializeField] private TeamShieldUIBinder allyTeamShieldUI;
 
     [Header("Camera")]
@@ -54,6 +58,7 @@ public class BattleManager : MonoBehaviour
     [Header("Team Shield (Runtime Debug)")]
     [SerializeField] private float allyTeamShieldHP = 0f;
 
+    // ─────────────────────────────────────
     private void Awake()
     {
         if (cameraController == null)
@@ -85,24 +90,11 @@ public class BattleManager : MonoBehaviour
         for (int i = 0; i < alliesBySlots.Length; i++)
             alliesBySlots[i] = null;
 
-        if (characterFactory == null)
-        {
-            Debug.LogError("❌ BattleManager: characterFactory is null", this);
-            return;
-        }
-
-        if (PartySelectionData.Instance == null)
-        {
-            Debug.LogError("❌ BattleManager: PartySelectionData.Instance is null", this);
-            return;
-        }
+        if (characterFactory == null) { Debug.LogError("❌ BattleManager: characterFactory is null", this); return; }
+        if (PartySelectionData.Instance == null) { Debug.LogError("❌ BattleManager: PartySelectionData.Instance is null", this); return; }
 
         var party = PartySelectionData.Instance.SelectedParty;
-        if (party == null || party.Count != 8)
-        {
-            Debug.LogError("❌ BattleManager: SelectedParty invalid (need 8 slots)", this);
-            return;
-        }
+        if (party == null || party.Count != 8) { Debug.LogError("❌ BattleManager: SelectedParty invalid (need 8 slots)", this); return; }
 
         for (int slot = 0; slot < 8; slot++)
         {
@@ -128,14 +120,12 @@ public class BattleManager : MonoBehaviour
         {
             enemyInstance = d;
             allCharacters.Add(d);
-
-            if (enemyPanel != null)
-                enemyPanel.Initialize(d);
+            if (enemyPanel != null) enemyPanel.Initialize(d);
         }
         else if (enemy != null)
         {
             allCharacters.Add(enemy);
-            Debug.LogWarning("⚠️ Enemy ที่สร้างมาไม่ใช่ Dysnorma: combo อาจไม่ทำงาน");
+            Debug.LogWarning("⚠️ Enemy ที่สร้างมาไม่ใช่ Dysnorma");
         }
 
         InitializeBacklineUnits();
@@ -145,10 +135,16 @@ public class BattleManager : MonoBehaviour
     {
         if (backlineUnits == null) return;
 
+        var backlineData = PartySelectionData.Instance?.SelectedBackline;
+
         for (int i = 0; i < backlineUnits.Count; i++)
         {
             BacklinePassiveUnit unit = backlineUnits[i];
             if (unit == null) continue;
+
+            if (backlineData != null && i < backlineData.Count && backlineData[i] != null)
+                unit.SetData(backlineData[i]);
+
             unit.Initialize(this);
         }
     }
@@ -168,8 +164,7 @@ public class BattleManager : MonoBehaviour
 
     private void Update()
     {
-        if (enemyPanel != null)
-            enemyPanel.UpdatePanel();
+        if (enemyPanel != null) enemyPanel.UpdatePanel();
 
         TickTeamOnHitBuffs(Time.deltaTime);
 
@@ -210,19 +205,14 @@ public class BattleManager : MonoBehaviour
     private void AddOrReplaceAllyTeamShield(float amount, bool replaceInsteadOfStack)
     {
         amount = Mathf.Max(0f, amount);
-
-        if (replaceInsteadOfStack)
-            allyTeamShieldHP = amount;
-        else
-            allyTeamShieldHP += amount;
-
+        if (replaceInsteadOfStack) allyTeamShieldHP = amount;
+        else allyTeamShieldHP += amount;
         SyncTeamShieldUI();
     }
 
     private float ApplyDamageToAllyWithTeamShield(BattleCharacter allyTarget, float rawDamage, BattleCharacter attacker)
     {
-        if (allyTarget == null || allyTarget.Stats == null || allyTarget.Stats.IsDead)
-            return 0f;
+        if (allyTarget == null || allyTarget.Stats == null || allyTarget.Stats.IsDead) return 0f;
 
         float dmgAfterDef = Mathf.Max(1f, rawDamage - allyTarget.EffectiveDefense);
 
@@ -234,30 +224,22 @@ public class BattleManager : MonoBehaviour
             SyncTeamShieldUI();
         }
 
-        if (dmgAfterDef <= 0f)
-            return 0f;
+        if (dmgAfterDef <= 0f) return 0f;
 
         allyTarget.Stats.CurrentHP = Mathf.Max(0f, allyTarget.Stats.CurrentHP - dmgAfterDef);
+        OnAllyTookDamage?.Invoke(allyTarget);
+
         return dmgAfterDef;
     }
 
     private void TickTeamOnHitBuffs(float dt)
     {
-        if (activeTeamOnHitBuffs.Count == 0) return;
-
         for (int i = activeTeamOnHitBuffs.Count - 1; i >= 0; i--)
         {
             TeamOnHitBuff b = activeTeamOnHitBuffs[i];
-            if (b == null)
-            {
-                activeTeamOnHitBuffs.RemoveAt(i);
-                continue;
-            }
-
+            if (b == null) { activeTeamOnHitBuffs.RemoveAt(i); continue; }
             b.Tick(dt);
-
-            if (b.IsExpired)
-                activeTeamOnHitBuffs.RemoveAt(i);
+            if (b.IsExpired) activeTeamOnHitBuffs.RemoveAt(i);
         }
     }
 
@@ -276,8 +258,7 @@ public class BattleManager : MonoBehaviour
         {
             BattleCharacter c = allCharacters[i];
             if (c == null || c.CharacterData == null || c.Stats == null) continue;
-            if (c.CharacterData.faction == CharacterFaction.Enemy && !c.Stats.IsDead)
-                return c;
+            if (c.CharacterData.faction == CharacterFaction.Enemy && !c.Stats.IsDead) return c;
         }
         return null;
     }
@@ -289,18 +270,11 @@ public class BattleManager : MonoBehaviour
         if (IsAlly(character))
         {
             if (currentReadyCharacter != null) return;
-
             currentReadyCharacter = character;
 
-            if (cameraController != null)
-                cameraController.FocusCharacter(character);
-
-            if (skillUI != null)
-                skillUI.ShowFor(character);
-
-            if (allyPanelBuilder != null)
-                allyPanelBuilder.HighlightCurrentTurn(character);
-
+            if (cameraController != null) cameraController.FocusCharacter(character);
+            if (skillUI != null) skillUI.ShowFor(character);
+            if (allyPanelBuilder != null) allyPanelBuilder.HighlightCurrentTurn(character);
             return;
         }
 
@@ -310,13 +284,12 @@ public class BattleManager : MonoBehaviour
             if (target == null) return;
 
             float dmg = enemy.GetBasicAttackDamage();
-
             float dealt = ApplyDamageToAllyWithTeamShield(target, dmg, enemy);
 
-            enemy.ChargeTimer = enemy.ChargeTimer + enemyAttackChargeGain;
+            enemy.ChargeTimer += enemyAttackChargeGain;
 
             if (verboseLog)
-                Debug.Log($"[BattleManager] Enemy attack: target={target.CharacterName} dealt={dealt:F0} enemyCharge+={enemyAttackChargeGain:F0} teamShield={allyTeamShieldHP:F0}");
+                Debug.Log($"[BattleManager] Enemy attack: target={target.CharacterName} dealt={dealt:F0} teamShield={allyTeamShieldHP:F0}");
 
             enemy.ResetATB();
         }
@@ -329,31 +302,33 @@ public class BattleManager : MonoBehaviour
         return Mathf.Max(0, boxes) * perBox;
     }
 
+    // ✅ อ่าน BonusChargeBoxesOnAttack รวมจาก buff ทั้งหมดที่ active อยู่บน character
+    private int GetBonusChargeBoxesFromBuffs(BattleCharacter c)
+    {
+        int total = 0;
+        var buffs = c.GetActiveBuffsReadOnly();
+        for (int i = 0; i < buffs.Count; i++)
+        {
+            TimedBuffInstance b = buffs[i];
+            if (b == null || b.IsExpired) continue;
+            total += b.BonusChargeBoxesOnAttack;
+        }
+        return total;
+    }
+
     private bool ValidateReady(BattleCharacter attacker, string actionIdForLog)
     {
         if (attacker == null)
-        {
-            Debug.LogWarning($"⚠️ {actionIdForLog}: attacker is null");
-            return false;
-        }
+        { Debug.LogWarning($"⚠️ {actionIdForLog}: attacker is null"); return false; }
 
         if (attacker != currentReadyCharacter)
-        {
-            Debug.LogWarning($"⚠️ {actionIdForLog}: attacker != currentReadyCharacter (attacker={attacker.CharacterName}, current={currentReadyCharacter?.CharacterName})");
-            return false;
-        }
+        { Debug.LogWarning($"⚠️ {actionIdForLog}: attacker != currentReadyCharacter"); return false; }
 
         if (!IsAlly(attacker))
-        {
-            Debug.LogWarning($"⚠️ {actionIdForLog}: currentReadyCharacter ไม่ใช่ Ally");
-            return false;
-        }
+        { Debug.LogWarning($"⚠️ {actionIdForLog}: ไม่ใช่ Ally"); return false; }
 
         if (!attacker.IsATBFull)
-        {
-            Debug.LogWarning($"⛔ {actionIdForLog}: ATB ยังไม่เต็ม (ATB={attacker.ATBTimer}/{attacker.ATBMaxTime})");
-            return false;
-        }
+        { Debug.LogWarning($"⛔ {actionIdForLog}: ATB ยังไม่เต็ม"); return false; }
 
         return true;
     }
@@ -365,31 +340,21 @@ public class BattleManager : MonoBehaviour
         for (int slot = 4; slot < 8; slot++)
         {
             BattleCharacter bc = alliesBySlots[slot];
-            if (bc == null) continue;
-            if (!IsAlly(bc)) continue;
-            if (bc.Stats == null) continue;
-            if (bc.Stats.IsDead) continue;
-
+            if (bc == null || !IsAlly(bc) || bc.Stats == null || bc.Stats.IsDead) continue;
             candidates.Add(bc);
         }
 
-        if (candidates.Count > 0)
-            return candidates[Random.Range(0, candidates.Count)];
+        if (candidates.Count > 0) return candidates[Random.Range(0, candidates.Count)];
 
         candidates.Clear();
         for (int i = 0; i < allies.Count; i++)
         {
             BattleCharacter a = allies[i];
-            if (a == null) continue;
-            if (!IsAlly(a)) continue;
-            if (a.Stats == null) continue;
-            if (a.Stats.IsDead) continue;
-
+            if (a == null || !IsAlly(a) || a.Stats == null || a.Stats.IsDead) continue;
             candidates.Add(a);
         }
 
-        if (candidates.Count == 0) return null;
-        return candidates[Random.Range(0, candidates.Count)];
+        return candidates.Count == 0 ? null : candidates[Random.Range(0, candidates.Count)];
     }
 
     private void EndPlayerTurn(BattleCharacter attacker, string actionIdForLog)
@@ -397,47 +362,29 @@ public class BattleManager : MonoBehaviour
         if (verboseLog)
             Debug.Log($"[BattleManager] EndTurn action={actionIdForLog} attacker={attacker.CharacterName}");
 
-        if (attacker.IsATBFull)
-            attacker.ResetATB();
-
-        if (skillUI != null)
-            skillUI.Hide();
+        if (attacker.IsATBFull) attacker.ResetATB();
+        if (skillUI != null) skillUI.Hide();
 
         if (returnToIdleAfterAction && cameraController != null)
             cameraController.ToIdle();
 
         currentReadyCharacter = null;
 
-        if (allyPanelBuilder != null)
-            allyPanelBuilder.ResetHighlights();
+        if (allyPanelBuilder != null) allyPanelBuilder.ResetHighlights();
     }
 
-    // =======================
-    // Team Follow-up Buff (เดิม)
-    // =======================
     private void RegisterTeamFollowUpHit(BattleCharacter owner, SkillAction skill)
     {
-        if (owner == null || skill == null) return;
-        if (!skill.enableTeamFollowUpHit) return;
+        if (owner == null || skill == null || !skill.enableTeamFollowUpHit) return;
 
         float dur = Mathf.Max(0f, skill.buffDurationSeconds);
-        if (dur <= 0f)
-        {
-            Debug.LogWarning($"⚠️ FollowUpHit '{skill.skillName}' duration <= 0");
-            return;
-        }
+        if (dur <= 0f) { Debug.LogWarning($"⚠️ FollowUpHit '{skill.skillName}' duration <= 0"); return; }
 
         TeamOnHitBuff existing = null;
         for (int i = 0; i < activeTeamOnHitBuffs.Count; i++)
         {
-            TeamOnHitBuff b = activeTeamOnHitBuffs[i];
-            if (b == null) continue;
-
-            if (b.Owner == owner)
-            {
-                existing = b;
-                break;
-            }
+            if (activeTeamOnHitBuffs[i] != null && activeTeamOnHitBuffs[i].Owner == owner)
+            { existing = activeTeamOnHitBuffs[i]; break; }
         }
 
         if (existing != null)
@@ -446,24 +393,13 @@ public class BattleManager : MonoBehaviour
             existing.AddEnemyComboOnProc = skill.followUpAddsEnemyCombo;
             existing.ComboAddAmount = Mathf.Max(0, skill.followUpEnemyComboAdd);
             existing.RefreshDuration(dur);
-
-            Debug.Log($"🟣 TeamBuff[{skill.skillName}] REFRESH owner={owner.CharacterName} dur={dur:F1}s");
             return;
         }
 
-        TeamOnHitBuff buff = new TeamOnHitBuff(
-            owner,
-            skill.followUpOwnerAtkMultiplier,
-            skill.followUpFlatBonusDamage,
-            dur
-        );
-
+        TeamOnHitBuff buff = new TeamOnHitBuff(owner, skill.followUpOwnerAtkMultiplier, skill.followUpFlatBonusDamage, dur);
         buff.AddEnemyComboOnProc = skill.followUpAddsEnemyCombo;
         buff.ComboAddAmount = Mathf.Max(0, skill.followUpEnemyComboAdd);
-
         activeTeamOnHitBuffs.Add(buff);
-
-        Debug.Log($"🟣 TeamBuff[{skill.skillName}] NEW owner={owner.CharacterName} dur={dur:F1}s");
     }
 
     private void NotifyAllyAttackLanded(BattleCharacter attackerWhoHit, BattleCharacter enemyTarget)
@@ -474,25 +410,17 @@ public class BattleManager : MonoBehaviour
         for (int i = activeTeamOnHitBuffs.Count - 1; i >= 0; i--)
         {
             TeamOnHitBuff b = activeTeamOnHitBuffs[i];
-            if (b == null || b.IsExpired)
-            {
-                activeTeamOnHitBuffs.RemoveAt(i);
-                continue;
-            }
-
-            if (b.Owner == null || b.Owner.Stats == null || b.Owner.Stats.IsDead)
-                continue;
+            if (b == null || b.IsExpired) { activeTeamOnHitBuffs.RemoveAt(i); continue; }
+            if (b.Owner == null || b.Owner.Stats == null || b.Owner.Stats.IsDead) continue;
 
             float raw = (b.Owner.EffectiveAttack * b.OwnerAttackMultiplier) + b.FlatBonusDamage;
             float dealt = enemyTarget.TakeDamage(raw, b.Owner);
 
-            Debug.Log($"🟣 FollowUpHit owner={b.Owner.CharacterName} procBy={attackerWhoHit.CharacterName} -> {enemyTarget.CharacterName} dealt={dealt:F0}");
+            if (verboseLog)
+                Debug.Log($"🟣 FollowUpHit owner={b.Owner.CharacterName} -> {enemyTarget.CharacterName} dealt={dealt:F0}");
         }
     }
 
-    // =======================
-    // Player actions
-    // =======================
     private void ExecuteBasicAttack(BattleCharacter attacker)
     {
         const string ACTION_ID = "Attack";
@@ -512,11 +440,21 @@ public class BattleManager : MonoBehaviour
         if (dealt > 0f)
             NotifyAllyAttackLanded(attacker, enemy);
 
-        float chargePoints = BoxesToChargePoints(basicAttackChargeBoxesGain);
-        attacker.AddCharge(chargePoints);
+        // ─── Charge ปกติ ───
+        int normalBoxes = basicAttackChargeBoxesGain;
+        attacker.AddCharge(BoxesToChargePoints(normalBoxes));
+
+        // ─── ✅ Bonus Charge จาก Buff ───
+        int bonusBoxes = GetBonusChargeBoxesFromBuffs(attacker);
+        if (bonusBoxes > 0)
+        {
+            attacker.AddCharge(BoxesToChargePoints(bonusBoxes));
+
+            if (verboseLog)
+                Debug.Log($"[BattleManager] {attacker.CharacterName} Bonus Charge +{bonusBoxes} box (from buff) total charge={attacker.ChargeTimer:F0}");
+        }
 
         attacker.PlayActionAnimation(ACTION_ID);
-
         EndPlayerTurn(attacker, ACTION_ID);
     }
 
@@ -526,8 +464,7 @@ public class BattleManager : MonoBehaviour
         for (int i = 0; i < allies.Count; i++)
         {
             BattleCharacter a = allies[i];
-            if (a == null || a.Stats == null) continue;
-            if (a.Stats.IsDead) continue;
+            if (a == null || a.Stats == null || a.Stats.IsDead) continue;
             result.Add(a);
         }
         return result;
@@ -540,37 +477,19 @@ public class BattleManager : MonoBehaviour
 
         switch (skill.targetType)
         {
-            case TargetType.Self:
-                targets.Add(attacker);
-                break;
-
-            case TargetType.AllAllies:
-                targets.AddRange(GetAliveAllies());
-                break;
-
+            case TargetType.Self: targets.Add(attacker); break;
+            case TargetType.AllAllies: targets.AddRange(GetAliveAllies()); break;
             case TargetType.EnemySingle:
-                {
-                    BattleCharacter enemy = GetCurrentEnemyTarget();
-                    if (enemy != null) targets.Add(enemy);
-                    break;
-                }
-
             case TargetType.AllEnemies:
-                {
-                    BattleCharacter enemy = GetCurrentEnemyTarget();
-                    if (enemy != null) targets.Add(enemy);
-                    break;
-                }
-
-            case TargetType.AllySingle:
-                targets.Add(attacker);
+                BattleCharacter e = GetCurrentEnemyTarget();
+                if (e != null) targets.Add(e);
                 break;
+            case TargetType.AllySingle: targets.Add(attacker); break;
         }
 
         return targets;
     }
 
-    // ✅ เปิดใช้ให้ Backline เรียกได้
     public List<BattleCharacter> GetTargetsForBacklineSkill(SkillAction skill, BattleCharacter proxySelf = null)
     {
         List<BattleCharacter> targets = new List<BattleCharacter>();
@@ -592,25 +511,15 @@ public class BattleManager : MonoBehaviour
 
         List<BattleCharacter> targets = GetTargetsForBacklineSkill(skill);
         if (targets == null || targets.Count == 0)
-        {
-            Debug.LogWarning($"⚠️ Backline: ไม่มี target สำหรับสกิล '{skill.skillName}'");
-            return false;
-        }
+        { Debug.LogWarning($"⚠️ Backline: ไม่มี target สำหรับสกิล '{skill.skillName}'"); return false; }
 
         bool ok = SkillExecutor.TryExecuteSkill_Backline(unit, skill, targets, out string reason);
-        if (!ok)
-        {
-            Debug.LogWarning($"⛔ Backline ใช้สกิลไม่สำเร็จ: {skill.skillName} reason={reason}");
-            return false;
-        }
+        if (!ok) { Debug.LogWarning($"⛔ Backline สกิลไม่สำเร็จ: {skill.skillName} reason={reason}"); return false; }
 
         if (skill.skillType == SkillType.Buff && skill.targetType == TargetType.AllAllies && skill.enableTeamShield)
         {
             float shield = Mathf.Max(0f, unit.Defense * skill.shieldFromOwnerDefenseMultiplier);
             AddOrReplaceAllyTeamShield(shield, skill.shieldReplaceInsteadOfStack);
-
-            if (verboseLog)
-                Debug.Log($"🛡️ Backline TeamShield +{shield:F0} (ownerDef={unit.Defense:F0} mul={skill.shieldFromOwnerDefenseMultiplier:F2}) => total={allyTeamShieldHP:F0}");
         }
 
         return true;
@@ -622,21 +531,14 @@ public class BattleManager : MonoBehaviour
 
         AllyCharacterData allyData = attacker.CharacterData as AllyCharacterData;
         if (allyData == null)
-        {
-            Debug.LogWarning($"⚠️ {actionId}: attacker data ไม่ใช่ AllyCharacterData");
-            return;
-        }
+        { Debug.LogWarning($"⚠️ {actionId}: attacker data ไม่ใช่ AllyCharacterData"); return; }
 
         if (actionId == "Ultimate")
         {
-            UltimateSkillAction ult = allyData.ultimateSkill;
-            if (ult == null)
-            {
-                Debug.LogWarning($"⚠️ Ultimate: ยังไม่ได้ตั้ง UltimateSkillAction ใน AllyCharacterData ของ '{attacker.CharacterName}'");
-                return;
-            }
+            if (allyData.ultimateSkill == null)
+            { Debug.LogWarning($"⚠️ Ultimate: ยังไม่ได้ตั้ง UltimateSkillAction ของ '{attacker.CharacterName}'"); return; }
 
-            ExecuteUltimate(attacker, ult);
+            ExecuteUltimate(attacker, allyData.ultimateSkill);
             EndPlayerTurn(attacker, actionId);
             return;
         }
@@ -646,24 +548,17 @@ public class BattleManager : MonoBehaviour
         else if (actionId == "Skill2") skill = allyData.GetEquippedSkill2();
 
         if (skill == null)
-        {
-            Debug.LogWarning($"⚠️ {actionId}: ยังไม่ได้ตั้ง SkillAction ใน AllyCharacterData ของ '{attacker.CharacterName}'");
-            return;
-        }
+        { Debug.LogWarning($"⚠️ {actionId}: ยังไม่ได้ตั้ง SkillAction ของ '{attacker.CharacterName}'"); return; }
 
         List<BattleCharacter> targets = GetSkillTargets(attacker, skill);
         if (targets == null || targets.Count == 0)
-        {
-            Debug.LogWarning($"⚠️ {actionId}: ไม่มี target สำหรับสกิล '{skill.skillName}' (targetType={skill.targetType})");
-            return;
-        }
+        { Debug.LogWarning($"⚠️ {actionId}: ไม่มี target สำหรับสกิล '{skill.skillName}'"); return; }
 
         bool ok = SkillExecutor.TryExecuteSkill(attacker, skill, targets, out string reason);
-        if (!ok)
-        {
-            Debug.LogWarning($"⛔ ใช้สกิลไม่สำเร็จ: {skill.skillName} reason={reason}");
-            return;
-        }
+        if (!ok) { Debug.LogWarning($"⛔ สกิลไม่สำเร็จ: {skill.skillName} reason={reason}"); return; }
+
+        // ✅ ยิง event ให้ Backline รับรู้
+        OnAllyUsedSkill?.Invoke(attacker, skill);
 
         attacker.PlayActionAnimation(skill.animationActionId);
 
@@ -671,9 +566,6 @@ public class BattleManager : MonoBehaviour
         {
             float shield = Mathf.Max(0f, attacker.EffectiveDefense * skill.shieldFromOwnerDefenseMultiplier);
             AddOrReplaceAllyTeamShield(shield, skill.shieldReplaceInsteadOfStack);
-
-            if (verboseLog)
-                Debug.Log($"🛡️ TeamShield +{shield:F0} (ownerDef={attacker.EffectiveDefense:F0} mul={skill.shieldFromOwnerDefenseMultiplier:F2}) => total={allyTeamShieldHP:F0}");
         }
 
         if (skill.skillType == SkillType.Buff && skill.enableTeamFollowUpHit && skill.targetType == TargetType.AllAllies)
@@ -682,8 +574,7 @@ public class BattleManager : MonoBehaviour
         if (skill.skillType == SkillType.Attack)
         {
             BattleCharacter enemy = GetCurrentEnemyTarget();
-            if (enemy != null)
-                NotifyAllyAttackLanded(attacker, enemy);
+            if (enemy != null) NotifyAllyAttackLanded(attacker, enemy);
         }
 
         EndPlayerTurn(attacker, actionId);
@@ -691,26 +582,13 @@ public class BattleManager : MonoBehaviour
 
     public void OnPlayerSelectedAction(BattleCharacter character, string actionId)
     {
-        if (string.IsNullOrEmpty(actionId))
-        {
-            Debug.LogWarning("⚠️ OnPlayerSelectedAction: actionId ว่าง");
-            return;
-        }
+        if (string.IsNullOrEmpty(actionId)) { Debug.LogWarning("⚠️ OnPlayerSelectedAction: actionId ว่าง"); return; }
 
         if (verboseLog)
-            Debug.Log($"[BattleManager] OnPlayerSelectedAction character={(character != null ? character.CharacterName : "null")} actionId={actionId}");
+            Debug.Log($"[BattleManager] OnPlayerSelectedAction character={character?.CharacterName} actionId={actionId}");
 
-        if (actionId == "Attack")
-        {
-            ExecuteBasicAttack(character);
-            return;
-        }
-
-        if (actionId == "Skill1" || actionId == "Skill2" || actionId == "Ultimate")
-        {
-            ExecuteSkillByActionId(character, actionId);
-            return;
-        }
+        if (actionId == "Attack") { ExecuteBasicAttack(character); return; }
+        if (actionId == "Skill1" || actionId == "Skill2" || actionId == "Ultimate") { ExecuteSkillByActionId(character, actionId); return; }
 
         Debug.Log($"ℹ️ ยังไม่ทำ {actionId} ตอนนี้");
     }
@@ -720,30 +598,18 @@ public class BattleManager : MonoBehaviour
         if (attacker == null || ult == null) return;
 
         UltimateRuntime rt = attacker.GetComponent<UltimateRuntime>();
-        if (rt == null)
-        {
-            Debug.LogWarning($"⚠️ Ultimate: '{attacker.CharacterName}' ไม่มี UltimateRuntime");
-            return;
-        }
+        if (rt == null) { Debug.LogWarning($"⚠️ Ultimate: '{attacker.CharacterName}' ไม่มี UltimateRuntime"); return; }
 
-        string reason;
-        if (!rt.CanUse(out reason))
-        {
-            Debug.LogWarning($"⛔ Ultimate ใช้ไม่ได้: {reason}");
-            return;
-        }
+        if (!rt.CanUse(out string reason)) { Debug.LogWarning($"⛔ Ultimate ใช้ไม่ได้: {reason}"); return; }
 
         BattleCharacter enemy = GetCurrentEnemyTarget();
-        if (enemy == null)
-        {
-            Debug.LogWarning("⚠️ Ultimate: ไม่มีศัตรูให้โจมตี");
-            return;
-        }
+        if (enemy == null) { Debug.LogWarning("⚠️ Ultimate: ไม่มีศัตรูให้โจมตี"); return; }
 
         float dmg = rt.ComputeDamageWithTier();
         float dealt = enemy.TakeDamage(dmg, attacker);
 
-        Debug.Log($"💥 Ultimate[{ult.skillName}] {attacker.CharacterName} -> {enemy.CharacterName} dealt={dealt:F0}");
+        if (verboseLog)
+            Debug.Log($"💥 Ultimate[{ult.skillName}] {attacker.CharacterName} -> {enemy.CharacterName} dealt={dealt:F0}");
 
         rt.ConsumeChargeByCurrentTier();
         rt.StartCooldown();
