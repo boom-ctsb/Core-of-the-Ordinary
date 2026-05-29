@@ -3,8 +3,10 @@ using UnityEngine;
 
 public class BattleAllyPanelBuilder : MonoBehaviour
 {
-    [Header("Rows")]
-    [SerializeField] private DynamicCharacterPanelRow backRow;
+    [Header("── แนวหลัง (Backline Passive) ──")]
+    [SerializeField] private DynamicBacklinePanelRow backlineRow;
+
+    [Header("── แนวหน้า (Front BattleCharacter) ──")]
     [SerializeField] private DynamicCharacterPanelRow frontRow;
 
     [Header("Debug")]
@@ -12,56 +14,42 @@ public class BattleAllyPanelBuilder : MonoBehaviour
 
     public void BuildFromAlliesSlots(IReadOnlyList<BattleCharacter> alliesBySlots8)
     {
-        if (alliesBySlots8 == null)
+        if (alliesBySlots8 == null || alliesBySlots8.Count != 8)
         {
-            Debug.LogError("❌ BattleAllyPanelBuilder: alliesBySlots8 is null", this);
+            Debug.LogError("❌ BattleAllyPanelBuilder: alliesBySlots8 invalid", this);
             return;
         }
 
-        if (alliesBySlots8.Count != 8)
-        {
-            Debug.LogError($"❌ BattleAllyPanelBuilder: need 8 slots but got {alliesBySlots8.Count}", this);
-            return;
-        }
-
-        if (backRow == null) Debug.LogError("❌ BattleAllyPanelBuilder: backRow is null", this);
-        if (frontRow == null) Debug.LogError("❌ BattleAllyPanelBuilder: frontRow is null", this);
-
-        List<BattleCharacter> backChars = new List<BattleCharacter>(4);
         List<BattleCharacter> frontChars = new List<BattleCharacter>(4);
-
-        for (int i = 0; i < 4; i++)
-            if (alliesBySlots8[i] != null) backChars.Add(alliesBySlots8[i]);
-
         for (int i = 4; i < 8; i++)
-            if (alliesBySlots8[i] != null) frontChars.Add(alliesBySlots8[i]);
+            if (alliesBySlots8[i] != null)
+                frontChars.Add(alliesBySlots8[i]);
 
         if (verbose)
+            Debug.Log($"[BattleAllyPanelBuilder] Build front panels: count={frontChars.Count}", this);
+
+        if (frontRow != null) frontRow.Build(frontChars);
+    }
+
+    // ✅ รับแค่ BattleManager — dataList อ่านเองจาก PartySelectionData
+    public void BuildBacklinePanels(BattleManager battleManager)
+    {
+        if (backlineRow == null)
         {
-            Debug.Log($"[BattleAllyPanelBuilder] Build panels: back={backChars.Count}, front={frontChars.Count}", this);
-            for (int i = 0; i < 8; i++)
-            {
-                var c = alliesBySlots8[i];
-                Debug.Log($"  slot {i}: {(c != null ? c.CharacterName : "(null)")}", this);
-            }
+            if (verbose) Debug.LogWarning("⚠️ BattleAllyPanelBuilder: backlineRow is null", this);
+            return;
         }
 
-        if (backRow != null) backRow.Build(backChars);
-        if (frontRow != null) frontRow.Build(frontChars);
+        backlineRow.Build(battleManager);
     }
 
     public void HighlightCurrentTurn(BattleCharacter current)
     {
-        if (
-backRow != null) backRow.HighlightCurrentTurn(current);
         if (frontRow != null) frontRow.HighlightCurrentTurn(current);
     }
 
     public void ResetHighlights()
     {
-        // ให้ normalize ทุกตัวโดยเรียก HighlightCurrentTurn(null)
-        // ใน DynamicCharacterPanelRow ด้านล่าง เราจะรองรับ current == null
-        if (backRow != null) backRow.HighlightCurrentTurn(null);
         if (frontRow != null) frontRow.HighlightCurrentTurn(null);
     }
 }

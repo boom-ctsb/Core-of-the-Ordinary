@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -6,28 +5,27 @@ using UnityEngine.UI;
 
 public class CharacterPanel : MonoBehaviour
 {
-    [Header("UI Portrait (แบบเดียวกับ PartySlots)")]
+    [Header("Portrait")]
     [SerializeField] private Image portraitImage;
     [SerializeField] private Image portraitEmptyOverlay;
 
-    [Header("UI เลือดและเวลา")]
+    [Header("HP / Time")]
     [SerializeField] private TextMeshProUGUI hpText;
     [SerializeField] private DynamicBar hpBar;
-
     [SerializeField] private TextMeshProUGUI timeText;
     [SerializeField] private DynamicBar timeBar;
 
-    [Tooltip("กล่อง Charge ทั้ง 10 ช่อง")]
-    [SerializeField] private Image[] chargeBoxes = new Image[10];
-
-    [Header("UI สเตตัส")]
+    [Header("Stats")]
     [SerializeField] private TextMeshProUGUI atkText;
     [SerializeField] private TextMeshProUGUI defText;
     [SerializeField] private TextMeshProUGUI spdText;
 
-    [Header("ตั้งค่าสีของ Charge Box")]
+    [Header("Charge")]
+    [SerializeField] private Image[] chargeBoxes = new Image[10];
     [SerializeField] private Color chargeFullColor = Color.green;
     [SerializeField] private Color chargeEmptyColor = new Color(0.2f, 0.2f, 0.2f);
+    [SerializeField] private Color chargeSpendPreviewColor = new Color(1f, 1f, 1f, 0.35f); // ใช้ charge
+    [SerializeField] private Color chargeGainPreviewColor = new Color(1f, 1f, 1f, 0.35f); // ได้ charge
 
     [Header("Ultimate Cooldown (Fill Only)")]
     [SerializeField] private Image ultimateCooldownFill;
@@ -54,12 +52,17 @@ public class CharacterPanel : MonoBehaviour
 
     private UltimateRuntime ultimateRuntime;
 
+    private bool previewActive = false;
+    private int previewDeltaBoxes = 0; // + = gain, - = spend
+
     public void Initialize(BattleCharacter character)
     {
         UnbindBuffEvents();
 
         this.character = character;
         wasATBFull = false;
+        previewActive = false;
+        previewDeltaBoxes = 0;
 
         if (character == null)
         {
@@ -139,21 +142,84 @@ public class CharacterPanel : MonoBehaviour
         if (spdText != null) spdText.text = $"Spd : {character.Stats.Speed:F0}";
     }
 
+    // ✅ เรียกตอน hover
+    public void SetChargePreview(int deltaBoxes)
+    {
+        Debug.Log($"SetChargePreview: delta={deltaBoxes} for {(character != null ? character.CharacterName : "null")}");
+
+        previewActive = true;
+        previewDeltaBoxes = deltaBoxes;
+        UpdateChargeBoxes();
+    }
+
+    // ✅ เรียกตอนออก hover
+    public void ClearChargePreview()
+    {
+        Debug.Log("ClearChargePreview");
+
+        previewActive = false;
+        previewDeltaBoxes = 0;
+        UpdateChargeBoxes();
+    }
+
     private void UpdateChargeBoxes()
     {
         if (character == null) return;
         if (chargeBoxes == null || chargeBoxes.Length == 0) return;
 
-        float chargePerBox = 100f / chargeBoxes.Length;
+        int totalBoxes = chargeBoxes.Length;
+        float chargePerBox = 100f / totalBoxes;
         float currentCharge = character.ChargeTimer;
 
-        for (int i = 0; i < chargeBoxes.Length; i++)
+        // นับจำนวนช่องที่เต็มตอนนี้
+        int filledCount = Mathf.Clamp(Mathf.FloorToInt(currentCharge / chargePerBox), 0, totalBoxes);
+
+        // 1) วาดสถานะปกติก่อน
+        for (int i = 0; i < totalBoxes; i++)
         {
             Image box = chargeBoxes[i];
             if (box == null) continue;
 
-            bool filled = currentCharge >= (i + 1) * chargePerBox;
+            bool filled = i < filledCount;
             box.color = filled ? chargeFullColor : chargeEmptyColor;
+        }
+
+        // 2) ถ้าไม่มี preview ก็จบ
+        if (!previewActive || previewDeltaBoxes == 0)
+            return;
+
+        // 3) preview ใช้ charge
+        if (previewDeltaBoxes < 0)
+        {
+            int spend = Mathf.Abs(previewDeltaBoxes);
+
+            // ไฮไลต์จากช่องที่เต็มล่าสุดย้อนกลับไป
+            int start = Mathf.Max(0, filledCount - spend);
+            int end = Mathf.Min(filledCount, totalBoxes);
+
+            for (int i = start; i < end; i++)
+            {
+                Image box = chargeBoxes[i];
+                if (box == null) continue;
+
+                box.color = chargeSpendPreviewColor;
+            }
+        }
+        // 4) preview ได้ charge
+        else if (previewDeltaBoxes > 0)
+        {
+            int gain = previewDeltaBoxes;
+
+            int start = Mathf.Clamp(filledCount, 0, totalBoxes);
+            int end = Mathf.Clamp(filledCount + gain, 0, totalBoxes);
+
+            for (int i = start; i < end; i++)
+            {
+                Image box = chargeBoxes[i];
+                if (box == null) continue;
+
+                box.color = chargeGainPreviewColor;
+            }
         }
     }
 
@@ -333,8 +399,7 @@ public class CharacterPanel : MonoBehaviour
         ui = null;
 
         GameObject prefab = buff.IconPrefabOverride != null ? buff.IconPrefabOverride : buffIconPrefab;
-        if (prefab == null)
-            return null;
+        if (prefab == null) return null;
 
         GameObject go = Instantiate(prefab, buffIconsAnchor);
 
