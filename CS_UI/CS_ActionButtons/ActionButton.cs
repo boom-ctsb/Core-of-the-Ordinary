@@ -1,59 +1,50 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class ActionButton : MonoBehaviour
+public class ActionButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    [Header("Action")]
-    [SerializeField] private string actionId = "Attack";
+    [SerializeField] private Button button;
+    [SerializeField] private string actionId;
 
-    [Header("Debug")]
-    [SerializeField] private bool verboseLog = false;
-
-    private Button button;
     private BattleSkillUI ownerUI;
 
     private void Awake()
     {
-        button = GetComponent<Button>();
         if (button == null)
-        {
-            Debug.LogError("❌ ActionButton: GameObject นี้ไม่มี Button component");
-            return;
-        }
+            button = GetComponent<Button>();
+
+        if (button != null)
+            button.onClick.AddListener(HandleClick);
     }
 
     public void Bind(BattleSkillUI ui)
     {
         ownerUI = ui;
-
-        if (button == null) return;
-
-        button.onClick.RemoveAllListeners();
-        button.onClick.AddListener(OnClick);
-
-        if (verboseLog)
-            Debug.Log($"[ActionButton] Bind ownerUI={(ownerUI != null ? ownerUI.name : "null")} actionId={actionId}");
     }
 
     public void SetActionId(string id)
     {
         actionId = id;
-
-        if (verboseLog)
-            Debug.Log($"[ActionButton] SetActionId={actionId}");
     }
 
-    private void OnClick()
+    private void HandleClick()
     {
-        if (verboseLog)
-            Debug.Log($"[ActionButton] Click actionId={actionId}");
+        if (ownerUI != null)
+            ownerUI.OnActionButtonPressed(actionId);
+    }
 
-        if (ownerUI == null)
-        {
-            Debug.LogError("❌ ActionButton: ownerUI เป็น null (ยังไม่ได้ Bind)");
-            return;
-        }
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        Debug.Log($"Hover Enter: {actionId}");
+        if (ownerUI != null)
+            ownerUI.OnActionButtonHoverEnter(actionId);
+    }
 
-        ownerUI.OnActionButtonPressed(actionId);
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        Debug.Log($"Hover Exit: {actionId}");
+        if (ownerUI != null)
+            ownerUI.OnActionButtonHoverExit(actionId);
     }
 }
