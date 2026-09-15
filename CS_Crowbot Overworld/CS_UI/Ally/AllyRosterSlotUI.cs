@@ -1,14 +1,15 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 [RequireComponent(typeof(Button))]
 public class AllyRosterSlotUI : MonoBehaviour
 {
-    [Header("UI (child Image in this Button)")]
+    [Header("UI")]
     [SerializeField] private Image portraitImage;
-    [SerializeField] private Text nameText; // optional
+    [SerializeField] private TextMeshProUGUI nameText;      // ← เปลี่ยนจาก Text เป็น TMP (เข้ากับ BacklinePartySlotUI)
 
-    [Header("Dim when selected (portrait only)")]
+    [Header("Dim when selected")]
     [Range(0f, 1f)][SerializeField] private float normalAlpha = 1f;
     [Range(0f, 1f)][SerializeField] private float selectedAlpha = 0.35f;
 
@@ -29,11 +30,7 @@ public class AllyRosterSlotUI : MonoBehaviour
     {
         _data = data;
 
-        if (data == null)
-        {
-            gameObject.SetActive(false);
-            return;
-        }
+        if (data == null) { gameObject.SetActive(false); return; }
 
         gameObject.SetActive(true);
 
@@ -43,8 +40,7 @@ public class AllyRosterSlotUI : MonoBehaviour
             portraitImage.enabled = data.portraitSprite != null;
         }
 
-        if (nameText != null)
-            nameText.text = data.characterName;
+        if (nameText != null) nameText.text = data.characterName;
 
         SetSelected(false);
     }

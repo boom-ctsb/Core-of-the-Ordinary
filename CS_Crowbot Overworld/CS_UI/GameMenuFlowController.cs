@@ -5,161 +5,222 @@ public class GameMenuFlowController : MonoBehaviour
 {
     public static GameMenuFlowController Instance { get; private set; }
 
-    public enum MenuState
+    public enum MenuPage
     {
         Closed = 0,
-        Mission = 1,
-        PartySelect = 2
+        MenuButtons = 1,
+        Story = 2,
+        Map = 3,
+        Team = 4,
+        Character = 5,
+        Archive = 6,
+        Setting = 7,
+        QuestDetail = 8,
+        TeamSelect = 9
     }
 
-    [Header("Input (Legacy; works with Active Input Handling = Both)")]
-    [SerializeField] private KeyCode openMissionKey = KeyCode.Tab;
-    [SerializeField] private KeyCode backKey = KeyCode.Escape;
+    public enum TeamSelectMode
+    {
+        Team = 0,  // เปิดจากปุ่ม Team → Accept = Start Battle
+        Story = 1   // เปิดจาก QuestDetail Accept → Accept = Start Story
+    }
 
-    [Header("Overlay")]
+    public MenuPage CurrentPage { get; private set; } = MenuPage.Closed;
+    public bool IsOpen => CurrentPage != MenuPage.Closed;
+    public int SelectedMissionIndex { get; private set; } = -1;
+    public TeamSelectMode CurrentTeamSelectMode { get; private set; } = TeamSelectMode.Team;
+
+    [Header("Input")]
+    [SerializeField] private KeyCode menuKey = KeyCode.Tab;
+    [SerializeField] private KeyCode backKey = KeyCode.Escape;
+    [SerializeField] private bool allowEscBack = true;
+
+    [Header("Player")]
+    [SerializeField] private PlayerController playerController;
+
+    [Header("Dimmer")]
     [SerializeField] private CanvasGroup dimmer;
     [Range(0f, 1f)]
     [SerializeField] private float dimmerAlpha = 0.65f;
 
     [Header("Panels")]
-    [SerializeField] private GameObject missionPanelRoot;
-    [SerializeField] private GameObject partySelectPanelRoot;
-
-    [Header("Mission Buttons")]
-    [SerializeField] private Button missionExitButton;
-    [SerializeField] private Button missionAcceptButton;
-
-    [Header("Party Select Buttons")]
-    [SerializeField] private Button partyExitButton;
-    [SerializeField] private Button partyAcceptButton; // (optional) เผื่อมี "Confirm"
+    [SerializeField] private GameObject menuButtonsPanel;
+    [SerializeField] private GameObject storyPanel;
+    [SerializeField] private GameObject mapPanel;
+    [SerializeField] private GameObject teamPanel;
+    [SerializeField] private GameObject characterPanel;
+    [SerializeField] private GameObject archivePanel;
+    [SerializeField] private GameObject settingPanel;
+    [SerializeField] private GameObject questDetailPanel;
+    [SerializeField] private GameObject teamSelectPanel;
 
     [Header("Behavior")]
     [SerializeField] private bool pauseGameWhenOpen = true;
-    [SerializeField] private bool allowEscBack = true;
-
-    public MenuState State { get; private set; } = MenuState.Closed;
-
-    // ข้อมูลที่เลือกจากหน้าภารกิจ
-    public int SelectedMissionIndex { get; private set; } = -1;
 
     private float _prevTimeScale = 1f;
 
+    // ─────────────────────────────────────────
     private void Awake()
     {
         if (Instance == null) Instance = this;
-        else Destroy(gameObject);
+        else { Destroy(gameObject); return; }
 
-        // Hook buttons
-        if (missionExitButton != null) missionExitButton.onClick.AddListener(CloseAll);
-        if (missionAcceptButton != null) missionAcceptButton.onClick.AddListener(GoToPartySelect);
-
-        if (partyExitButton != null) partyExitButton.onClick.AddListener(CloseAll);
-        if (partyAcceptButton != null) partyAcceptButton.onClick.AddListener(ConfirmParty); // optional
-
-        // start closed
-        SetState(MenuState.Closed, immediate: true);
+        GoToPage(MenuPage.Closed, immediate: true);
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(openMissionKey))
+        if (DialogueManager.Instance != null && DialogueManager.Instance.IsPlaying)
+            return;
+
+        if (Input.GetKeyDown(menuKey))
         {
-            if (State == MenuState.Closed) OpenMission();
-            else CloseAll();
+            if (IsOpen) CloseMenu();
+            else OpenMenu();
             return;
         }
 
-        if (!allowEscBack) return;
+        if (allowEscBack && IsOpen && Input.GetKeyDown(backKey))
+            HandleBack();
+    }
 
-        if (State != MenuState.Closed && Input.GetKeyDown(backKey))
+    // ─────────────────────────────────────────
+    // Back Logic
+    // ─────────────────────────────────────────
+
+    private void HandleBack()
+    {
+        switch (CurrentPage)
         {
-            // ESC behavior:
-            // PartySelect -> Mission
-            // Mission -> CloseAll
-            if (State == MenuState.PartySelect) OpenMission();
-            else CloseAll();
+            case MenuPage.MenuButtons:
+                CloseMenu();
+                break;
+            case MenuPage.QuestDetail:
+                GoToPage(MenuPage.Story);
+                break;
+            case MenuPage.TeamSelect:
+                if (CurrentTeamSelectMode == TeamSelectMode.Story)
+                    GoToPage(MenuPage.QuestDetail);
+                else
+                    GoToPage(MenuPage.MenuButtons);
+                break;
+            default:
+                GoToPage(MenuPage.MenuButtons);
+                break;
         }
     }
 
-    // ===== Public API =====
+    // ─────────────────────────────────────────
+    // Public API
+    // ─────────────────────────────────────────
 
-    public void OpenMission()
-    {
-        SetState(MenuState.Mission, immediate: false);
-    }
-
-    public void GoToPartySelect()
-    {
-        // Accept on mission -> open party select (still paused)
-        SetState(MenuState.PartySelect, immediate: false);
-    }
-
-    public void CloseAll()
-    {
-        SetState(MenuState.Closed, immediate: false);
-    }
+    public void OpenMenu() { GoToPage(MenuPage.MenuButtons); }
+    public void CloseMenu() { GoToPage(MenuPage.Closed); }
 
     public void SetSelectedMission(int index)
     {
         SelectedMissionIndex = index;
+        Debug.Log($"[GameMenuFlowController] Selected Mission: {index}");
     }
 
-    // เผื่อ Input System ใหม่: เอาไป bind Action แล้วเรียกได้
-    public void ToggleMissionFromInputSystem()
+    // ─────────────────────────────────────────
+    // ปุ่มเมนูหลัก
+    // ─────────────────────────────────────────
+
+    public void OnClick_Story() { GoToPage(MenuPage.Story); }
+    public void OnClick_Map() { GoToPage(MenuPage.Map); }
+    public void OnClick_Character() { GoToPage(MenuPage.Character); }
+    public void OnClick_Archive() { GoToPage(MenuPage.Archive); }
+    public void OnClick_Setting() { GoToPage(MenuPage.Setting); }
+    public void OnClick_Resume() { CloseMenu(); }
+    public void OnClick_Back() { HandleBack(); }
+
+    // Team ในเมนูหลัก → mode = Team
+    public void OnClick_Team()
     {
-        if (State == MenuState.Closed) OpenMission();
-        else CloseAll();
+        CurrentTeamSelectMode = TeamSelectMode.Team;
+        GoToPage(MenuPage.TeamSelect);
     }
 
-    // ===== Party confirm (optional) =====
-    private void ConfirmParty()
+    // Story Panel กดสล็อต Quest → เปิด QuestDetail
+    public void OnClick_QuestDetail(int missionIndex)
     {
-        // ตรงนี้คุณค่อยต่อไปเข้าระบบเริ่มสู้ / ยืนยันทีม / ฯลฯ
-        // ตอนนี้ผมทำให้ปิดเมนูกลับไปเล่นก่อน
-        CloseAll();
+        SetSelectedMission(missionIndex);
+        GoToPage(MenuPage.QuestDetail);
     }
 
-    // ===== Internals =====
-    private void SetState(MenuState newState, bool immediate)
+    // QuestDetailPanel กด Accept → mode = Story
+    public void OpenTeamSelectForStory()
     {
-        if (State == newState && !immediate) return;
+        CurrentTeamSelectMode = TeamSelectMode.Story;
+        GoToPage(MenuPage.TeamSelect);
+    }
 
-        // Handle pause transitions
-        bool goingFromClosedToOpen = (State == MenuState.Closed && newState != MenuState.Closed);
-        bool goingFromOpenToClosed = (State != MenuState.Closed && newState == MenuState.Closed);
+    public void OnClick_Exit()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
+    }
 
-        State = newState;
+    // ─────────────────────────────────────────
+    // GoToPage
+    // ─────────────────────────────────────────
 
-        // Panels
-        if (missionPanelRoot != null) missionPanelRoot.SetActive(State == MenuState.Mission);
-        if (partySelectPanelRoot != null) partySelectPanelRoot.SetActive(State == MenuState.PartySelect);
+    public void GoToPage(MenuPage page, bool immediate = false)
+    {
+        if (CurrentPage == page && !immediate) return;
 
-        // Dimmer
-        bool overlayVisible = State != MenuState.Closed;
-        ApplyDimmer(overlayVisible);
-
-        // UIManager overlay flag (cursor)
-        if (UIManager.Instance != null)
-            UIManager.Instance.SetOverlayOpen(overlayVisible);
+        bool wasOpen = IsOpen;
+        CurrentPage = page;
+        bool nowOpen = IsOpen;
 
         if (pauseGameWhenOpen)
         {
-            if (goingFromClosedToOpen)
+            if (!wasOpen && nowOpen)
             {
                 _prevTimeScale = Time.timeScale;
                 Time.timeScale = 0f;
             }
-            else if (goingFromOpenToClosed)
+            else if (wasOpen && !nowOpen)
             {
                 Time.timeScale = _prevTimeScale;
             }
         }
+
+        if (playerController != null)
+            playerController.enabled = !nowOpen;
+
+        ApplyDimmer(nowOpen);
+
+        if (UIManager.Instance != null)
+            UIManager.Instance.SetOverlayOpen(nowOpen);
+
+        SetPanelActive(menuButtonsPanel, page == MenuPage.MenuButtons);
+        SetPanelActive(storyPanel, page == MenuPage.Story);
+        SetPanelActive(mapPanel, page == MenuPage.Map);
+        SetPanelActive(teamPanel, page == MenuPage.Team);
+        SetPanelActive(characterPanel, page == MenuPage.Character);
+        SetPanelActive(archivePanel, page == MenuPage.Archive);
+        SetPanelActive(settingPanel, page == MenuPage.Setting);
+        SetPanelActive(questDetailPanel, page == MenuPage.QuestDetail);
+        SetPanelActive(teamSelectPanel, page == MenuPage.TeamSelect);
+    }
+
+    // ─────────────────────────────────────────
+    // Helper
+    // ─────────────────────────────────────────
+
+    private void SetPanelActive(GameObject panel, bool active)
+    {
+        if (panel != null) panel.SetActive(active);
     }
 
     private void ApplyDimmer(bool visible)
     {
         if (dimmer == null) return;
-
         dimmer.alpha = visible ? dimmerAlpha : 0f;
         dimmer.blocksRaycasts = visible;
         dimmer.interactable = visible;

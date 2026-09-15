@@ -9,10 +9,9 @@ public class AllyPartySlotUI : MonoBehaviour
     [SerializeField] private Image emptyOverlay;
 
     private BaseCharacterData _data;
-
     private Button _button;
 
-    public void Awake()
+    private void Awake()   // ← เพิ่ม private
     {
         _button = GetComponent<Button>();
         _button.onClick.AddListener(OnClick);
@@ -27,33 +26,28 @@ public class AllyPartySlotUI : MonoBehaviour
 
     public BaseCharacterData GetData() => _data;
 
+    // ← เปลี่ยนชื่อจาก Refresh เพื่อความชัดเจน + เรียกตรงได้
     private void Refresh()
     {
         bool has = _data != null;
 
-        // blank overlay
         if (emptyOverlay != null)
             emptyOverlay.enabled = !has;
 
-        // portrait
         if (portraitImage != null)
         {
             portraitImage.sprite = has ? _data.portraitSprite : null;
-            portraitImage.enabled = has; // << สำคัญ: เปิดเมื่อมี data (อย่าผูกกับ sprite != null)
+            portraitImage.enabled = has;
         }
 
-        // Debug ช่วยจับ “รูปหาย”
         if (has && _data.portraitSprite == null)
-        {
             Debug.LogWarning($"PartySlot: '{_data.characterName}' has NO portraitSprite assigned.", this);
-        }
     }
 
     private void OnClick()
     {
         if (AllySelectUIController.Instance == null) return;
-        if (_data == null) return; // ช่องว่างไม่ต้องทำอะไร
-
+        if (_data == null) return;
         AllySelectUIController.Instance.RemoveFromPartyByData(_data);
     }
 }
