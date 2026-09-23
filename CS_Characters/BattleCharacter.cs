@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class BattleCharacter : MonoBehaviour
+public abstract class BattleCharacter : MonoBehaviour, IRuntimeBuffIconOwner
 {
     [Header("Identity / Data")]
     [SerializeField] protected string characterName;

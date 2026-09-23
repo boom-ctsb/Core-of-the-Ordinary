@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -40,7 +40,7 @@ public class BattleManager : MonoBehaviour
     [Header("Turn Flow (Real-time ATB option)")]
     [SerializeField] private bool enemyCanActWhilePlayerChoosing = true;
 
-    [Header("Backline Passive Units (No Field)")]
+    [Header("Support Units (Separate from SelectedParty 8 battle slots)")]
     [SerializeField] private List<BacklinePassiveUnit> backlineUnits = new List<BacklinePassiveUnit>();
 
     [Header("Debug")]
@@ -129,6 +129,8 @@ public class BattleManager : MonoBehaviour
         }
 
         InitializeBacklineUnits();
+        if (allyPanelBuilder != null)
+            allyPanelBuilder.BuildSupportPanels(this);
     }
 
     private void InitializeBacklineUnits()

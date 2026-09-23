@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -30,6 +31,7 @@ public class UltimateButtonUI : MonoBehaviour
 
     private BattleCharacter owner;
     private UltimateRuntime runtime;
+    private Action pressedCallback;
 
     private Color buttonBaseColor = Color.white;
     private bool hasBaseColor = false;
@@ -59,11 +61,12 @@ public class UltimateButtonUI : MonoBehaviour
         }
     }
 
-    public void Bind(BattleCharacter ownerCharacter)
+    public void Bind(BattleCharacter ownerCharacter, Action onPressed = null, bool bindClickHandler = true)
     {
         Unbind();
 
         owner = ownerCharacter;
+        pressedCallback = onPressed;
 
         if (ultimateButton == null)
             ultimateButton = GetComponent<Button>();
@@ -97,7 +100,8 @@ public class UltimateButtonUI : MonoBehaviour
         if (ultimateButton != null)
         {
             ultimateButton.onClick.RemoveListener(OnPressed);
-            ultimateButton.onClick.AddListener(OnPressed);
+            if (bindClickHandler)
+                ultimateButton.onClick.AddListener(OnPressed);
         }
 
         if (debugLogs)
@@ -113,6 +117,7 @@ public class UltimateButtonUI : MonoBehaviour
 
         runtime = null;
         owner = null;
+        pressedCallback = null;
     }
 
     private void OnDisable()
@@ -133,20 +138,15 @@ public class UltimateButtonUI : MonoBehaviour
 
     private void OnPressed()
     {
-        if (runtime == null) return;
-
-        string reason;
-        if (!runtime.CanUse(out reason))
+        if (pressedCallback != null)
         {
-            if (debugLogs) Debug.Log($"Ultimate not ready: {reason}", this);
-            Refresh();
+            pressedCallback.Invoke();
             return;
         }
 
-        runtime.StartCooldown();
-        runtime.ConsumeChargeByCurrentTier();
+        if (debugLogs)
+            Debug.Log("UltimateButtonUI has no action callback; BattleManager should own ultimate execution.", this);
 
-        if (debugLogs) Debug.Log("Ultimate used (demo)", this);
         Refresh();
     }
 

@@ -88,13 +88,13 @@ public class BattleSkillUI : MonoBehaviour
             return;
         }
 
-        attackButtonInstance = SpawnButton(data.attackButtonPrefab, attackSlot, "Attack");
-        skill1ButtonInstance = SpawnButton(data.skill1ButtonPrefab, skill1Slot, "Skill1");
-        skill2ButtonInstance = SpawnButton(data.skill2ButtonPrefab, skill2Slot, "Skill2");
-        ultimateButtonInstance = SpawnButton(data.ultimateButtonPrefab, ultimateSlot, "Ultimate");
+        attackButtonInstance = SpawnButton(data.attackButtonPrefab, attackSlot, "Attack", true);
+        skill1ButtonInstance = SpawnButton(data.skill1ButtonPrefab, skill1Slot, "Skill1", data.GetEquippedSkill1() != null);
+        skill2ButtonInstance = SpawnButton(data.skill2ButtonPrefab, skill2Slot, "Skill2", data.GetEquippedSkill2() != null);
+        ultimateButtonInstance = SpawnButton(data.GetUltimateButtonPrefab(), ultimateSlot, "Ultimate", data.ultimateSkill != null);
     }
 
-    private GameObject SpawnButton(GameObject prefab, Transform slot, string actionId)
+    private GameObject SpawnButton(GameObject prefab, Transform slot, string actionId, bool interactable)
     {
         if (slot == null) return null;
 
@@ -132,10 +132,14 @@ public class BattleSkillUI : MonoBehaviour
             Debug.LogWarning($"⚠️ SpawnButton: prefab '{prefab.name}' ไม่มี ActionButton");
         }
 
+        Button button = go.GetComponentInChildren<UnityEngine.UI.Button>(true);
+        if (button != null)
+            button.interactable = interactable;
+
         UltimateButtonUI ultUI = go.GetComponentInChildren<UltimateButtonUI>(true);
         if (ultUI != null && currentCharacter != null)
         {
-            ultUI.Bind(currentCharacter);
+            ultUI.Bind(currentCharacter, () => OnActionButtonPressed("Ultimate"), bindClickHandler: ab == null);
         }
 
         return go;
@@ -276,6 +280,20 @@ public class BattleSkillUI : MonoBehaviour
         if (actionId == "Ultimate")
             return "Ultimate";
 
+        if (currentCharacter != null)
+        {
+            AllyCharacterData data = currentCharacter.CharacterData as AllyCharacterData;
+            if (data != null)
+            {
+                string reason = actionId == "Skill1"
+                    ? data.GetEquippedSkillAvailabilityMessage(1)
+                    : data.GetEquippedSkillAvailabilityMessage(2);
+
+                if (!string.IsNullOrEmpty(reason))
+                    return "Locked Skill";
+            }
+        }
+
         SkillAction skill = GetSkillByActionId(actionId);
         if (skill != null && !string.IsNullOrWhiteSpace(skill.skillName))
             return skill.skillName;
@@ -290,6 +308,20 @@ public class BattleSkillUI : MonoBehaviour
 
         if (actionId == "Ultimate")
             return "ใช้ท่าไม้ตาย";
+
+        if (currentCharacter != null)
+        {
+            AllyCharacterData data = currentCharacter.CharacterData as AllyCharacterData;
+            if (data != null)
+            {
+                string reason = actionId == "Skill1"
+                    ? data.GetEquippedSkillAvailabilityMessage(1)
+                    : data.GetEquippedSkillAvailabilityMessage(2);
+
+                if (!string.IsNullOrEmpty(reason))
+                    return reason;
+            }
+        }
 
         SkillAction skill = GetSkillByActionId(actionId);
         if (skill != null)

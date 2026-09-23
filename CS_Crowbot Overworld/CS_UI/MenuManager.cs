@@ -19,6 +19,9 @@ public class MenuManager : MonoBehaviour
 
     private void Update()
     {
+        if (GameMenuFlowController.Instance != null)
+            return;
+
         if (DialogueManager.Instance != null && DialogueManager.Instance.IsPlaying) return;
 
         if (Input.GetKeyDown(menuKey))
