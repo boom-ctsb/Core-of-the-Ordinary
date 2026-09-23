@@ -73,6 +73,8 @@ public class TalkInteractable : MonoBehaviour
         // ห้าม interact ถ้า dialogue กำลังเล่นอยู่
         if (DialogueManager.Instance != null && DialogueManager.Instance.IsPlaying) return;
 
+        if (UIManager.Instance != null && UIManager.Instance.IsOverlayOpen) return;
+
         // ห้าม interact ถ้าไม่ได้อยู่ใน Explore phase
         if (EpisodeManager.Instance != null && !EpisodeManager.Instance.IsExploring()) return;
 

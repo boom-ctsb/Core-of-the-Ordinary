@@ -5,8 +5,11 @@ public class PartySelectionData : MonoBehaviour
 {
     public static PartySelectionData Instance { get; private set; }
 
-    // index 0-3 = แนวหลัง, 4-7 = แนวหน้า (ตรงกับ CharacterPanelManager)
+    // SelectedParty = ทีมต่อสู้จริง 8 ช่องเสมอ
+    // index 0-3 = แนวหลัง, 4-7 = แนวหน้า
     public readonly List<BaseCharacterData> SelectedParty = new List<BaseCharacterData>(8);
+
+    // SelectedBackline = หน่วย support แยกจากทีมต่อสู้ 8 ช่อง
     public readonly List<AllyBacklineData> SelectedBackline = new List<AllyBacklineData>(4);
 
     private void Awake()

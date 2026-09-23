@@ -3,11 +3,14 @@ using UnityEngine;
 
 public class BattleAllyPanelBuilder : MonoBehaviour
 {
-    [Header("── แนวหลัง (Backline Passive) ──")]
-    [SerializeField] private DynamicBacklinePanelRow backlineRow;
+    [Header("── ตัวต่อสู้ 8 ช่อง: แนวหลัง 0-3 ──")]
+    [SerializeField] private DynamicCharacterPanelRow backRow;
 
-    [Header("── แนวหน้า (Front BattleCharacter) ──")]
+    [Header("── ตัวต่อสู้ 8 ช่อง: แนวหน้า 4-7 ──")]
     [SerializeField] private DynamicCharacterPanelRow frontRow;
+
+    [Header("── Support Units (SelectedBackline) ──")]
+    [SerializeField] private DynamicBacklinePanelRow supportRow;
 
     [Header("Debug")]
     [SerializeField] private bool verbose = true;
@@ -20,36 +23,43 @@ public class BattleAllyPanelBuilder : MonoBehaviour
             return;
         }
 
+        List<BattleCharacter> backChars = new List<BattleCharacter>(4);
+        for (int i = 0; i < 4; i++)
+            if (alliesBySlots8[i] != null)
+                backChars.Add(alliesBySlots8[i]);
+
         List<BattleCharacter> frontChars = new List<BattleCharacter>(4);
         for (int i = 4; i < 8; i++)
             if (alliesBySlots8[i] != null)
                 frontChars.Add(alliesBySlots8[i]);
 
         if (verbose)
-            Debug.Log($"[BattleAllyPanelBuilder] Build front panels: count={frontChars.Count}", this);
+            Debug.Log($"[BattleAllyPanelBuilder] Build battle rows: back={backChars.Count}, front={frontChars.Count}", this);
 
+        if (backRow != null) backRow.Build(backChars);
         if (frontRow != null) frontRow.Build(frontChars);
     }
 
-    // ✅ รับแค่ BattleManager — dataList อ่านเองจาก PartySelectionData
-    public void BuildBacklinePanels(BattleManager battleManager)
+    public void BuildSupportPanels(BattleManager battleManager)
     {
-        if (backlineRow == null)
+        if (supportRow == null)
         {
-            if (verbose) Debug.LogWarning("⚠️ BattleAllyPanelBuilder: backlineRow is null", this);
+            if (verbose) Debug.LogWarning("⚠️ BattleAllyPanelBuilder: supportRow is null", this);
             return;
         }
 
-        backlineRow.Build(battleManager);
+        supportRow.Build(battleManager);
     }
 
     public void HighlightCurrentTurn(BattleCharacter current)
     {
+        if (backRow != null) backRow.HighlightCurrentTurn(current);
         if (frontRow != null) frontRow.HighlightCurrentTurn(current);
     }
 
     public void ResetHighlights()
     {
+        if (backRow != null) backRow.HighlightCurrentTurn(null);
         if (frontRow != null) frontRow.HighlightCurrentTurn(null);
     }
 }

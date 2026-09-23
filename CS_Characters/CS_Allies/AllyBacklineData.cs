@@ -1,5 +1,13 @@
 using UnityEngine;
 
+public enum BacklineTrigger
+{
+    OnEnemyStunned = 0,
+    OnAllyHit = 1,
+    OnAllyUsedSkill = 2,
+    PassiveTimer = 3
+}
+
 [CreateAssetMenu(fileName = "NewAllyBacklineData", menuName = "Data/Characters/Ally Backline Data")]
 public class AllyBacklineData : ScriptableObject
 {
@@ -14,6 +22,9 @@ public class AllyBacklineData : ScriptableObject
 
     [Header("Backline Skill")]
     public SkillAction passiveSkill;
+
+    [Header("Trigger")]
+    public BacklineTrigger triggerCondition = BacklineTrigger.OnEnemyStunned;
 
     [Header("Timebar")]
     public float timebarMax = 100f;

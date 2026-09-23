@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 // วางบน GameObject ที่มี Collider2D (isTrigger = true).
 // ใช้งานร่วมกับ ZoneGroup (leftBg/rightBg + optional spawn).
@@ -55,6 +55,7 @@ public class ZoneSwitcher : MonoBehaviour
     void Update()
     {
         if (!playerInZone) return;
+        if (UIManager.Instance != null && UIManager.Instance.IsOverlayOpen) return;
         if (Time.time - lastSwitchAt < cooldown) return;
         if (zoneGroup == null) return;
 

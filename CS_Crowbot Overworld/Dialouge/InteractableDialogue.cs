@@ -47,6 +47,7 @@ public class InteractableDialogue : MonoBehaviour
     {
         if (!playerInRange) return;
         if (DialogueManager.Instance != null && DialogueManager.Instance.IsPlaying) return;
+        if (UIManager.Instance != null && UIManager.Instance.IsOverlayOpen) return;
 
         if (Input.GetKeyDown(interactKey))
             TryStartDialogue();
@@ -94,7 +95,7 @@ public class InteractableDialogue : MonoBehaviour
 
         if (DialogueManager.Instance == null)
         {
-            Debug.LogWarning("[InteractableDialogue] ไม่เจอ DialogueManager ใน Scene"); 
+            Debug.LogWarning("[InteractableDialogue] ไม่เจอ DialogueManager ใน Scene");
             return;
         }
 

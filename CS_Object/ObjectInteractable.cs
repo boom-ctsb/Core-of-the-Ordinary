@@ -78,6 +78,7 @@ public class ObjectInteractable : MonoBehaviour
     {
         if (!_playerNearby || _isDone) return;
         if (DialogueManager.Instance != null && DialogueManager.Instance.IsPlaying) return;
+        if (UIManager.Instance != null && UIManager.Instance.IsOverlayOpen) return;
         if (EpisodeManager.Instance != null && !EpisodeManager.Instance.IsExploring()) return;
 
         if (Input.GetKeyDown(interactKey))
