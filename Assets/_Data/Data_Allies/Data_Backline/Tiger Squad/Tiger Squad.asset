@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d6d8d0121f07644a91fb261a72b1a6, type: 3}
+  m_Name: Tiger Squad
+  m_EditorClassIdentifier: Assembly-CSharp::AllyBacklineData
+  characterName: Tiger Squad
+  portraitSprite: {fileID: -1706825709656965621, guid: b60919fd78290f74e83c91e48048550d, type: 3}
+  attack: 100
+  defense: 10
+  speed: 20
+  passiveSkill: {fileID: 0}
+  useSkillPool: 1
+  skillPool:
+  - {fileID: 11400000, guid: 19839e41cc2de4c48811daeca68c5c8d, type: 2}
+  - {fileID: 11400000, guid: 1832ccab17bcd15478147ccad55c6741, type: 2}
+  - {fileID: 11400000, guid: 0c0687c16bf21d944a6c60f7ab01cbac, type: 2}
+  - {fileID: 11400000, guid: 3c91d4026eb28ba498a40928c9d2e074, type: 2}
+  triggerCondition: 3
+  triggerIcon: {fileID: 21300000, guid: 7df38fd177f6a9a42bc61f69159f503d, type: 3}
+  timebarMax: 100
+  baseFillPercentPerSecond: 0.2
+  speedBaseline: 25
+  fillWindowSeconds: 3
+  passiveTickIntervalSeconds: 3
+  maxTicksToFill: 6
+  passiveTickMinPercent: 0.1
+  passiveTickMaxPercent: 0.35
+  conditionIconOverride: {fileID: 0}

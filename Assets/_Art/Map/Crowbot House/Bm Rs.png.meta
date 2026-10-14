@@ -1,0 +1,533 @@
+fileFormatVersion: 2
+guid: a0468d4c9c90c7c44943c2be648566bd
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 7913181324858003328
+    second: Bm Rs_0
+  - first:
+      213: -5115539844981201083
+    second: Bm Rs_1
+  - first:
+      213: 4436764577077685228
+    second: Bm Rs_2
+  - first:
+      213: 8170709554043576021
+    second: Bm Rs_3
+  - first:
+      213: 6614349572795441774
+    second: Bm Rs_4
+  - first:
+      213: -8835978711312871941
+    second: Bm Rs_5
+  - first:
+      213: -3616816850825279247
+    second: Bm Rs_6
+  - first:
+      213: -8575033121668842663
+    second: Bm Rs_7
+  - first:
+      213: 3676371528234779266
+    second: Bm Rs_8
+  - first:
+      213: 3073214809581609333
+    second: Bm Rs_9
+  - first:
+      213: -6413006099952519368
+    second: Bm Rs_10
+  - first:
+      213: -704362892890912997
+    second: Bm Rs_11
+  - first:
+      213: -4309892267262635230
+    second: Bm Rs_12
+  - first:
+      213: 4053471663104030243
+    second: Bm Rs_13
+  - first:
+      213: 7177773521022595738
+    second: Bm Rs_14
+  - first:
+      213: -2821703998636488037
+    second: Bm Rs_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 16384
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 2
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Bm Rs_0
+      rect:
+        serializedVersion: 2
+        x: 425
+        y: 5
+        width: 27
+        height: 1195
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 08f8a673d7441dd60800000000000000
+      internalID: 7913181324858003328
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bm Rs_1
+      rect:
+        serializedVersion: 2
+        x: 600
+        y: 5
+        width: 390
+        height: 1195
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 547e9814d93f109b0800000000000000
+      internalID: -5115539844981201083
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bm Rs_2
+      rect:
+        serializedVersion: 2
+        x: 992
+        y: 410
+        width: 488
+        height: 258
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ceb60c830ed829d30800000000000000
+      internalID: 4436764577077685228
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bm Rs_3
+      rect:
+        serializedVersion: 2
+        x: 1951
+        y: 5
+        width: 232
+        height: 1195
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5de58a39c01346170800000000000000
+      internalID: 8170709554043576021
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bm Rs_4
+      rect:
+        serializedVersion: 2
+        x: 2733
+        y: 31
+        width: 570
+        height: 626
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e62aab264e3eacb50800000000000000
+      internalID: 6614349572795441774
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bm Rs_5
+      rect:
+        serializedVersion: 2
+        x: 3860
+        y: 5
+        width: 192
+        height: 1195
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bfd48455d2c406580800000000000000
+      internalID: -8835978711312871941
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bm Rs_6
+      rect:
+        serializedVersion: 2
+        x: 4048
+        y: 5
+        width: 117
+        height: 1195
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1f889e4ac3c7ecdc0800000000000000
+      internalID: -3616816850825279247
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bm Rs_7
+      rect:
+        serializedVersion: 2
+        x: 4076
+        y: 357
+        width: 1244
+        height: 583
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 95b38bdeecc5ff880800000000000000
+      internalID: -8575033121668842663
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bm Rs_8
+      rect:
+        serializedVersion: 2
+        x: 5323
+        y: 5
+        width: 50
+        height: 1195
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2824bca3d68150330800000000000000
+      internalID: 3676371528234779266
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bm Rs_9
+      rect:
+        serializedVersion: 2
+        x: 5508
+        y: 115
+        width: 24
+        height: 1085
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 571e493369046aa20800000000000000
+      internalID: 3073214809581609333
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bm Rs_10
+      rect:
+        serializedVersion: 2
+        x: 983
+        y: 107
+        width: 493
+        height: 299
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 837baedfdec6007a0800000000000000
+      internalID: -6413006099952519368
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bm Rs_11
+      rect:
+        serializedVersion: 2
+        x: 5128
+        y: 78
+        width: 22
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b1745484ea99936f0800000000000000
+      internalID: -704362892890912997
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bm Rs_12
+      rect:
+        serializedVersion: 2
+        x: 5148
+        y: 5
+        width: 23
+        height: 113
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2239b9551df2034c0800000000000000
+      internalID: -4309892267262635230
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bm Rs_13
+      rect:
+        serializedVersion: 2
+        x: 1225
+        y: 33
+        width: 30
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3267d6a5003d04830800000000000000
+      internalID: 4053471663104030243
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bm Rs_14
+      rect:
+        serializedVersion: 2
+        x: 4314
+        y: 5
+        width: 41
+        height: 55
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a92b1c6ecf29c9360800000000000000
+      internalID: 7177773521022595738
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bm Rs_15
+      rect:
+        serializedVersion: 2
+        x: 1422
+        y: 0
+        width: 17
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b9a09fbc92b47d8d0800000000000000
+      internalID: -2821703998636488037
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Bm Rs_0: 7913181324858003328
+      Bm Rs_1: -5115539844981201083
+      Bm Rs_10: -6413006099952519368
+      Bm Rs_11: -704362892890912997
+      Bm Rs_12: -4309892267262635230
+      Bm Rs_13: 4053471663104030243
+      Bm Rs_14: 7177773521022595738
+      Bm Rs_15: -2821703998636488037
+      Bm Rs_2: 4436764577077685228
+      Bm Rs_3: 8170709554043576021
+      Bm Rs_4: 6614349572795441774
+      Bm Rs_5: -8835978711312871941
+      Bm Rs_6: -3616816850825279247
+      Bm Rs_7: -8575033121668842663
+      Bm Rs_8: 3676371528234779266
+      Bm Rs_9: 3073214809581609333
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

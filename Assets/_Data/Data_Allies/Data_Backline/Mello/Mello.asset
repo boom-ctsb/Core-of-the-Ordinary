@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d6d8d0121f07644a91fb261a72b1a6, type: 3}
+  m_Name: Mello
+  m_EditorClassIdentifier: Assembly-CSharp::AllyBacklineData
+  characterName: Mello
+  portraitSprite: {fileID: -5507478521917666979, guid: b6d65a7d8994d0747907a81bd7b4fc25, type: 3}
+  attack: 100
+  defense: 10
+  speed: 20
+  passiveSkill: {fileID: 11400000, guid: bc84b3f26806e414cb5b7f8f459c2c7b, type: 2}
+  triggerCondition: 2
+  triggerIcon: {fileID: 21300000, guid: e00bfea979275344da6c0a2e7a83dce7, type: 3}
+  timebarMax: 100
+  baseFillPercentPerSecond: 0.2
+  speedBaseline: 25
+  fillWindowSeconds: 3
+  passiveTickIntervalSeconds: 7
+  passiveTickMinPercent: 0.1
+  passiveTickMaxPercent: 0.35
+  maxTicksToFill: 1

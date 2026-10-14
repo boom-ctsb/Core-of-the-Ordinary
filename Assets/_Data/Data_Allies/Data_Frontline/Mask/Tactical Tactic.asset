@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49586b602bd39eb44949995f8aa17465, type: 3}
+  m_Name: Tactical Tactic
+  m_EditorClassIdentifier: Assembly-CSharp::SkillAction
+  skillName: Tactical Tactic
+  skillIcon: {fileID: 21300000, guid: 543b9c341c5d1184e900dac3bfa794c8, type: 3}
+  description: 
+  skillType: 2
+  targetType: 12
+  powerBase: 0
+  attackMultiplier: 1
+  accuracy: 100
+  chargeCost: 10
+  buffDurationSeconds: 30
+  buffAttackAdd: 0
+  buffDefenseAdd: 0
+  buffSpeedAdd: 0
+  buffHpRegenPerSecond: 0
+  buffEvasionChanceAdd: 0.75
+  buffBonusChargeBoxesOnAttack: 0
+  debuffSpeedPercent: 0
+  debuffAccuracyPercent: 0
+  debuffAttackAdd: 0
+  debuffDefenseAdd: 0
+  isStunDebuff: 0
+  isLoseTurnDebuff: 0
+  targetATBShiftUnits: 0
+  targetChargeShift: 0
+  enableTeamFollowUpHit: 0
+  followUpOwnerAtkMultiplier: 0
+  followUpFlatBonusDamage: 0
+  followUpAddsEnemyCombo: 1
+  followUpEnemyComboAdd: 0
+  enableTeamShield: 0
+  shieldFromOwnerDefenseMultiplier: 1
+  shieldReplaceInsteadOfStack: 0
+  statusIconPrefabOverride: {fileID: 7041380880316890525, guid: 34f3379790fc7b84d89214f1b6d9b09f, type: 3}
+  overrideATBAfterUse: 0
+  atbAfterUsePercent: 0
+  animationActionId: Tactical Tactic

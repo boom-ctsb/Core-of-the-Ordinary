@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49586b602bd39eb44949995f8aa17465, type: 3}
+  m_Name: Metal
+  m_EditorClassIdentifier: Assembly-CSharp::SkillAction
+  skillName: Metal
+  skillIcon: {fileID: 0}
+  description: 
+  skillType: 0
+  targetType: 1
+  powerBase: 0
+  attackMultiplier: 1
+  accuracy: 100
+  chargeCost: 0
+  buffDurationSeconds: 5
+  buffAttackAdd: 0
+  buffDefenseAdd: 0
+  buffSpeedAdd: 0
+  buffHpRegenPerSecond: 0
+  buffEvasionChanceAdd: 0
+  buffBonusChargeBoxesOnAttack: 0
+  debuffSpeedPercent: 0
+  debuffAccuracyPercent: 0
+  debuffAttackAdd: 0
+  debuffDefenseAdd: 0
+  isStunDebuff: 1
+  isLoseTurnDebuff: 0
+  targetATBShiftUnits: 0
+  targetChargeShift: 0
+  enableTeamFollowUpHit: 0
+  followUpOwnerAtkMultiplier: 1
+  followUpFlatBonusDamage: 0
+  followUpAddsEnemyCombo: 1
+  followUpEnemyComboAdd: 1
+  enableTeamShield: 0
+  shieldFromOwnerDefenseMultiplier: 1
+  shieldReplaceInsteadOfStack: 0
+  statusIconPrefabOverride: {fileID: 0}
+  overrideATBAfterUse: 0
+  atbAfterUsePercent: 0
+  animationActionId: Attack

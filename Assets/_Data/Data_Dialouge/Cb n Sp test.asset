@@ -1,0 +1,136 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c67d519d60793542a301c4bcc1f2fda, type: 3}
+  m_Name: Cb n Sp test
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueData
+  defaultBackground: {fileID: 0}
+  initialElements:
+  - id: Cha
+    sprite: {fileID: 21300000, guid: 68a25974a633cae43b46f0a4eae69289, type: 3}
+    position: {x: 0, y: 0}
+    sortOrder: 40
+    size: {x: 1920, y: 1080}
+    visibleOnStart: 1
+  - id: Space
+    sprite: {fileID: 21300000, guid: bd016b6e552e3e741bdf7099ed3e5271, type: 3}
+    position: {x: 0, y: 0}
+    sortOrder: 0
+    size: {x: 1920, y: 1080}
+    visibleOnStart: 0
+  - id: Bg
+    sprite: {fileID: 21300000, guid: 410ab7d498b4e9e418138e4d0c6f6c43, type: 3}
+    position: {x: 0, y: 0}
+    sortOrder: 0
+    size: {x: 1920, y: 1080}
+    visibleOnStart: 1
+  - id: Desk
+    sprite: {fileID: 21300000, guid: e37a9989f8f5c894d9c397b639117486, type: 3}
+    position: {x: 0, y: 0}
+    sortOrder: 50
+    size: {x: 1920, y: 1080}
+    visibleOnStart: 0
+  beats:
+  - isSceneBeat: 0
+    speakerName: Crowbot
+    dialogueText: Test 1
+    waitSeconds: 0
+    changes:
+    - targetId: Cha
+      newSprite: {fileID: 0}
+      useNewVisible: 0
+      newVisible: 0
+    - targetId: Bg
+      newSprite: {fileID: 0}
+      useNewVisible: 0
+      newVisible: 0
+  - isSceneBeat: 0
+    speakerName: Crowbot
+    dialogueText: Test 2
+    waitSeconds: 0
+    changes:
+    - targetId: Cha
+      newSprite: {fileID: 21300000, guid: 64255734058bc9946b4ac30ba05084bf, type: 3}
+      useNewVisible: 0
+      newVisible: 0
+    - targetId: Bg
+      newSprite: {fileID: 21300000, guid: 410ab7d498b4e9e418138e4d0c6f6c43, type: 3}
+      useNewVisible: 0
+      newVisible: 0
+  - isSceneBeat: 0
+    speakerName: Space
+    dialogueText: Test 3
+    waitSeconds: 0
+    changes:
+    - targetId: Cha
+      newSprite: {fileID: 21300000, guid: bd016b6e552e3e741bdf7099ed3e5271, type: 3}
+      useNewVisible: 0
+      newVisible: 1
+    - targetId: Bg
+      newSprite: {fileID: 21300000, guid: 50bd4417022f3ce4ba1e370e6a0bd264, type: 3}
+      useNewVisible: 0
+      newVisible: 1
+    - targetId: Desk
+      newSprite: {fileID: 21300000, guid: e37a9989f8f5c894d9c397b639117486, type: 3}
+      useNewVisible: 1
+      newVisible: 1
+  - isSceneBeat: 0
+    speakerName: Space
+    dialogueText: Test 4
+    waitSeconds: 0
+    changes:
+    - targetId: Cha
+      newSprite: {fileID: 21300000, guid: 5efc694f78e47fd41a9bca2d129f8bb5, type: 3}
+      useNewVisible: 0
+      newVisible: 0
+    - targetId: Bg
+      newSprite: {fileID: 21300000, guid: 50bd4417022f3ce4ba1e370e6a0bd264, type: 3}
+      useNewVisible: 0
+      newVisible: 0
+    - targetId: Desk
+      newSprite: {fileID: 21300000, guid: e37a9989f8f5c894d9c397b639117486, type: 3}
+      useNewVisible: 1
+      newVisible: 1
+  repeatBeats:
+  - isSceneBeat: 0
+    speakerName: Space
+    dialogueText: How stubborn are they?
+    waitSeconds: 0
+    changes:
+    - targetId: Cha
+      newSprite: {fileID: 21300000, guid: bd016b6e552e3e741bdf7099ed3e5271, type: 3}
+      useNewVisible: 0
+      newVisible: 0
+    - targetId: Bg
+      newSprite: {fileID: 21300000, guid: 50bd4417022f3ce4ba1e370e6a0bd264, type: 3}
+      useNewVisible: 0
+      newVisible: 0
+    - targetId: Desk
+      newSprite: {fileID: 21300000, guid: e37a9989f8f5c894d9c397b639117486, type: 3}
+      useNewVisible: 1
+      newVisible: 1
+  - isSceneBeat: 0
+    speakerName: Space
+    dialogueText: Go ahead and take them down.
+    waitSeconds: 0
+    changes:
+    - targetId: Cha
+      newSprite: {fileID: 21300000, guid: 5efc694f78e47fd41a9bca2d129f8bb5, type: 3}
+      useNewVisible: 0
+      newVisible: 0
+    - targetId: Bg
+      newSprite: {fileID: 21300000, guid: 50bd4417022f3ce4ba1e370e6a0bd264, type: 3}
+      useNewVisible: 0
+      newVisible: 0
+    - targetId: Desk
+      newSprite: {fileID: 21300000, guid: e37a9989f8f5c894d9c397b639117486, type: 3}
+      useNewVisible: 1
+      newVisible: 1

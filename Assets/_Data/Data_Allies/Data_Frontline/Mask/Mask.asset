@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da1471fd94d4226449c455597c13fe3c, type: 3}
+  m_Name: Mask
+  m_EditorClassIdentifier: Assembly-CSharp::AllyCharacterData
+  characterId: Mask
+  characterName: Mask
+  faction: 0
+  portraitSprite: {fileID: 257703783329910431, guid: 93dbcb5bde625bd48a79e8c0b8111e5b, type: 3}
+  description: 
+  characterPrefab: {fileID: 8560332718954828898, guid: 4e2da6eedac66e54986d2dd0c1901e17, type: 3}
+  idleDisplayPrefab: {fileID: 2026909770193151921, guid: b667c76d2d3f8554fa187b4c418a22dc, type: 3}
+  maxHP: 4000
+  attack: 50
+  defense: 50
+  speed: 25
+  attackName: Attack
+  attackDescription: Attack and gain 2 charges
+  attackAnimTrigger: Attack
+  skill1AnimTrigger: Skill1
+  skill2AnimTrigger: Skill2
+  ultimateAnimTrigger: Ultimate
+  allyRow: 0
+  attackButtonPrefab: {fileID: 385376031779705768, guid: e46c83e86a86e164daf1b2d06c0e17af, type: 3}
+  skill1ButtonPrefab: {fileID: 7324544830890683651, guid: 2cd30f88b63b87a45bdf5dd82fbe4012, type: 3}
+  skill2ButtonPrefab: {fileID: 7324544830890683651, guid: 39d919feb0da199428b284c128bf29bf, type: 3}
+  ultimateButtonPrefab: {fileID: 690100824706999722, guid: 0d0acb22b71200f41825e6d564900bab, type: 3}
+  ultimateSkill: {fileID: 11400000, guid: 9d8d3ee0dc467cd44b2c60e49d27f095, type: 2}
+  allSkills:
+  - {fileID: 11400000, guid: 2e89f792aaa07ed42ac24890e39c1afb, type: 2}
+  - {fileID: 11400000, guid: 664e56a60c1b0d8478c91274dc37bb2a, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  equippedSkill1Index: 0
+  equippedSkill2Index: 1

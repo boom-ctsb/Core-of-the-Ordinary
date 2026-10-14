@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da1471fd94d4226449c455597c13fe3c, type: 3}
+  m_Name: Thrill
+  m_EditorClassIdentifier: Assembly-CSharp::AllyCharacterData
+  characterId: Thrill
+  characterName: Thrill
+  faction: 0
+  portraitSprite: {fileID: 9098352310126455274, guid: c4bc8b0f6988fa948b0674b2f43e6492, type: 3}
+  description: 
+  characterPrefab: {fileID: 5214895271056374803, guid: b15bcdbec54b97948b3e708583cb618d, type: 3}
+  idleDisplayPrefab: {fileID: 5307305487009312206, guid: 9892dd2ed120f8b41ad481a3362bf572, type: 3}
+  maxHP: 5000
+  attack: 20
+  defense: 50
+  speed: 15
+  attackName: Attack
+  attackDescription: Attack and gain 2 charges
+  attackAnimTrigger: Attack
+  skill1AnimTrigger: Skill1
+  skill2AnimTrigger: Skill2
+  ultimateAnimTrigger: Ultimate
+  allyRow: 0
+  attackButtonPrefab: {fileID: 385376031779705768, guid: e46c83e86a86e164daf1b2d06c0e17af, type: 3}
+  skill1ButtonPrefab: {fileID: 7324544830890683651, guid: a696185d0c765fd4e9c701e3b10cb2e4, type: 3}
+  skill2ButtonPrefab: {fileID: 7324544830890683651, guid: df133dbe65283d248b519600439060e3, type: 3}
+  ultimateButtonPrefab: {fileID: 690100824706999722, guid: e6b525d04d559034fb7f6a84674bde2c, type: 3}
+  ultimateSkill: {fileID: 11400000, guid: 4fdedf7a626bc5e448ce0a26f6360b55, type: 2}
+  allSkills:
+  - {fileID: 11400000, guid: 48c945de6367ef444a7d0a3f7de90edd, type: 2}
+  - {fileID: 11400000, guid: f6a1bc8d823681643b899271e94c761e, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  equippedSkill1Index: 0
+  equippedSkill2Index: 1

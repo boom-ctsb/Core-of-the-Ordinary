@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d6d8d0121f07644a91fb261a72b1a6, type: 3}
+  m_Name: Ay
+  m_EditorClassIdentifier: Assembly-CSharp::AllyBacklineData
+  characterName: Ay
+  portraitSprite: {fileID: -7464434664610454064, guid: 4dc03bddffd66984cbef858b26c6b840, type: 3}
+  attack: 50
+  defense: 10
+  speed: 20
+  passiveSkill: {fileID: 11400000, guid: 7330a47e5c1075443b943becfb14961a, type: 2}
+  triggerCondition: 1
+  triggerIcon: {fileID: 21300000, guid: f79171aaf511fd148a1d41125b6332bb, type: 3}
+  timebarMax: 100
+  baseFillPercentPerSecond: 0.25
+  speedBaseline: 100
+  fillWindowSeconds: 15
+  passiveTickIntervalSeconds: 3
+  maxTicksToFill: 6
+  passiveTickMinPercent: 0.1
+  passiveTickMaxPercent: 0.35
+  conditionIconOverride: {fileID: 0}

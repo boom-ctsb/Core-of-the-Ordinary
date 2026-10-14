@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94aefcc0841f3c445ac0367e4c30ed5e, type: 3}
+  m_Name: Dummy2
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyCharacterData
+  characterId: Dysnorma
+  characterName: Dysnorma
+  faction: 1
+  portraitSprite: {fileID: 21300000, guid: 9717132e1a2a0ac40a2878bb043e184d, type: 3}
+  description: 
+  characterPrefab: {fileID: 3845382401969664675, guid: 67c0159bd24fba649ac5cdec4c1c5ed5, type: 3}
+  idleDisplayPrefab: {fileID: 3845382401969664675, guid: 67c0159bd24fba649ac5cdec4c1c5ed5, type: 3}
+  maxHP: 25000
+  attack: 50
+  defense: 0
+  speed: 5
+  attackName: Attack
+  attackDescription: "\u0E42\u0E08\u0E21\u0E15\u0E35\u0E1B\u0E01\u0E15\u0E34\u0E43\u0E2A\u0E48\u0E28\u0E31\u0E15\u0E23\u0E39
+    1 \u0E40\u0E1B\u0E49\u0E32\u0E2B\u0E21\u0E32\u0E22 \u0E41\u0E25\u0E30\u0E40\u0E1E\u0E34\u0E48\u0E21
+    Charge"
+  attackAnimTrigger: Attack
+  skill1AnimTrigger: Skill1
+  skill2AnimTrigger: Skill2
+  ultimateAnimTrigger: Ultimate
+  basicAttackMultiplier: 2
+  comboMax: 10
+  patternId: 
+  isBoss: 0
