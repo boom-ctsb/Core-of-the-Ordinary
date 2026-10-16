@@ -1,0 +1,11 @@
+﻿<Solution>
+  <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="Febucci.HierarchyIcons.Examples.csproj" />
+  <Project Path="Unity.InputSystem.Recorder.csproj" />
+  <Project Path="Unity.InputSystem.RebindingUI.csproj" />
+  <Project Path="InputSystem.Samples.Visualizers.csproj" />
+  <Project Path="Unity.InputSystem.InGameHints.csproj" />
+  <Project Path="UnityEngine.InputSystem.Samples.UIvsGameInput.csproj" />
+  <Project Path="PSDImporterCustomPacker.csproj" />
+  <Project Path="Febucci.HierarchyIcons.csproj" />
+</Solution>
