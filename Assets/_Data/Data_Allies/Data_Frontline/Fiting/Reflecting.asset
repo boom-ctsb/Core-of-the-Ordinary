@@ -15,8 +15,8 @@ MonoBehaviour:
   skillName: Reflecting
   skillIcon: {fileID: 0}
   description: 
-  buttonPrefab: {fileID: 2306983244403924727, guid: dda04abe65fbcb2479cf1c95728a94ff, type: 3}
-  costType: 1
+  buttonPrefab: {fileID: 690100824706999722, guid: 62c4f6a6abc413743bc5238a62a6afc7, type: 3}
+  costType: 0
   cooldownSeconds: 30
   requiredCharge: 10
   requiredShield: 0

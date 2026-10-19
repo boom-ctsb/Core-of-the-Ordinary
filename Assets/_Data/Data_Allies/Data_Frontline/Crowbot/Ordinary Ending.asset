@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 725ddb0c74ea57a4aaf3dab8e52271b5, type: 3}
-  m_Name: Dys Ending
+  m_Name: Ordinary Ending
   m_EditorClassIdentifier: Assembly-CSharp::UltimateSkillAction
   skillName: Dys Ending
   skillIcon: {fileID: 0}
   description: 
-  buttonPrefab: {fileID: 2306983244403924727, guid: 13972543946744f48a9735f1bbeba676, type: 3}
-  costType: 2
+  buttonPrefab: {fileID: 690100824706999722, guid: 0c50091a672e0fd449bf0f55decd8fb7, type: 3}
+  costType: 1
   cooldownSeconds: 30
-  requiredCharge: 10
+  requiredCharge: 50
   requiredShield: 0
   powerType: 1
   baseDamage: 50

@@ -408,7 +408,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -7464434664610454064, guid: 4dc03bddffd66984cbef858b26c6b840, type: 3}
+  m_Sprite: {fileID: -2898933462334863481, guid: 81252e4b1f753d24e903c5bbc7da66aa, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -483,7 +483,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: f79171aaf511fd148a1d41125b6332bb, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -922,11 +922,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BacklinePanelUI
   portraitImage: {fileID: 9118699239182277673}
   portraitEmptyOverlay: {fileID: 9118699239182277673}
+  triggerIconImage: {fileID: 4328544120266062745}
   timeText: {fileID: 2796462733561430035}
   timeBar: {fileID: 8353401712899207217}
   conditionIconUI: {fileID: 7046519520046222256}
   conditionIconRoot: {fileID: 6197102187370039436}
-  triggerIconImage: {fileID: 4328544120266062745}
   buffIconsAnchor: {fileID: 7624393778583825089}
   buffIconPrefab: {fileID: 7041380880316890525, guid: 34f3379790fc7b84d89214f1b6d9b09f, type: 3}
   maxBuffIcons: 1
@@ -943,10 +943,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1cfcedaef5a01bc489d2df34dfefbd23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BacklinePassiveUnit
-  battleManager: {fileID: 1270509333045953527, guid: ec0f13d4a9e52bd4fab18971ff1101f9, type: 3}
+  data: {fileID: 11400000, guid: 56caeba47d2b0334db6ed563422b8298, type: 2}
+  battleManager: {fileID: 0}
   panelUI: {fileID: -6321206033576473318}
   proxySelf: {fileID: 0}
-  verboseLog: 0
 --- !u!1 &8484237261276073405
 GameObject:
   m_ObjectHideFlags: 0
