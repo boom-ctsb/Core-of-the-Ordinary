@@ -271,7 +271,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 0/100
+  m_text: 0/1
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -408,7 +408,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -2898933462334863481, guid: 81252e4b1f753d24e903c5bbc7da66aa, type: 3}
+  m_Sprite: {fileID: -1706825709656965621, guid: b60919fd78290f74e83c91e48048550d, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -435,7 +435,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &5653199806419491504
 RectTransform:
   m_ObjectHideFlags: 0
@@ -829,7 +829,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &5365308659218237316
 RectTransform:
   m_ObjectHideFlags: 0
@@ -943,7 +943,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1cfcedaef5a01bc489d2df34dfefbd23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BacklinePassiveUnit
-  data: {fileID: 11400000, guid: 56caeba47d2b0334db6ed563422b8298, type: 2}
+  data: {fileID: 11400000, guid: 68db5b8f86ddd4c479a6a563a57d1bdb, type: 2}
   battleManager: {fileID: 0}
   panelUI: {fileID: -6321206033576473318}
   proxySelf: {fileID: 0}

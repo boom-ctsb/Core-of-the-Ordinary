@@ -15,7 +15,7 @@ MonoBehaviour:
   skillName: Dizzy Chop
   skillIcon: {fileID: 21300000, guid: 77810014069dddd42a8c068513259f81, type: 3}
   description: 
-  skillType: 0
+  skillType: 3
   targetType: 0
   powerBase: 0
   attackMultiplier: 1

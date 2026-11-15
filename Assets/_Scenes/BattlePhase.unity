@@ -231,7 +231,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -300, y: -274.5}
+  m_AnchoredPosition: {x: -300, y: -251}
   m_SizeDelta: {x: 102, y: 99}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &19940931
@@ -248,6 +248,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TeamShieldUIBinder
   shieldPrefab: {fileID: 6488291711739320787, guid: c1a8491469109794cb88fb9c69721363, type: 3}
   shieldAnchor: {fileID: 19940930}
+  shieldStatusUI: {fileID: 0}
 --- !u!1 &111221745
 GameObject:
   m_ObjectHideFlags: 0
@@ -3184,7 +3185,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BattleManager
   characterFactory: {fileID: 543828124}
-  selectedEnemy: {fileID: 11400000, guid: 0175376a2ba9b714fbdb9a037e89bb89, type: 2}
+  selectedEnemyName: Dysnorma
   allyPanelBuilder: {fileID: 1968941829}
   enemyPanel: {fileID: 1784580480}
   enemyAttackChargeGain: 20
@@ -3473,8 +3474,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cef4e2ed3e079e45973f3129fe77ca5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BattleAllyPanelBuilder
-  backlineRow: {fileID: 1342990585}
+  backRow: {fileID: 0}
   frontRow: {fileID: 434369982}
+  supportRow: {fileID: 0}
   verbose: 1
 --- !u!1001 &1981441806
 PrefabInstance:

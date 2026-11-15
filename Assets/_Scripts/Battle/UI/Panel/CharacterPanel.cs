@@ -46,6 +46,17 @@ public class CharacterPanel : MonoBehaviour
 
     private bool wasATBFull = false;
 
+    // cache ค่าที่แสดงอยู่ เพื่อตั้งข้อความเฉพาะตอนค่าเปลี่ยน (ลดขยะ/การสร้าง mesh ของ TMP)
+    private float shownHP = -1f, shownMaxHP = -1f;
+    private int shownATB = -1, shownATBMax = -1;
+    private float shownAtk = -1f, shownDef = -1f, shownSpd = -1f;
+    private void ResetShownCache()
+    {
+        shownHP = shownMaxHP = -1f;
+        shownATB = shownATBMax = -1;
+        shownAtk = shownDef = shownSpd = -1f;
+    }
+
     private readonly List<TimedBuffInstance> trackedBuffs = new List<TimedBuffInstance>();
     private readonly List<GameObject> buffIconGOs = new List<GameObject>();
     private readonly List<StatusEffectIconUI> buffIconUIs = new List<StatusEffectIconUI>();
@@ -60,8 +71,8 @@ public class CharacterPanel : MonoBehaviour
         UnbindBuffEvents();
 
         this.character = character;
+        ResetShownCache();
         wasATBFull = false;
-        previewActive = false;
         previewDeltaBoxes = 0;
 
         if (character == null)
@@ -104,12 +115,16 @@ public class CharacterPanel : MonoBehaviour
         float currentHP = character.Stats.CurrentHP;
         float maxHP = character.Stats.MaxHP;
 
-        if (hpText != null) hpText.text = $"Hp : {currentHP:F0}/{maxHP:F0}";
+        if (hpText != null && (currentHP != shownHP || maxHP != shownMaxHP))
+        {
+            shownHP = currentHP;
+            shownMaxHP = maxHP;
+            hpText.text = $"Hp : {currentHP:F0}/{maxHP:F0}";
+        }
         if (hpBar != null) hpBar.SetFillAmount(currentHP, maxHP);
 
         float currentATB = character.ATBTimer;
         float maxATB = character.ATBMaxTime;
-
         bool isFull = character.IsATBFull;
 
         if (isFull && !wasATBFull)
@@ -124,9 +139,15 @@ public class CharacterPanel : MonoBehaviour
 
         if (timeText != null)
         {
-            int cur = Mathf.RoundToInt(currentATB);
             int max = Mathf.RoundToInt(maxATB);
-            timeText.text = isFull ? $"{max}/{max}" : $"{cur}/{max}";
+            int cur = isFull ? max : Mathf.RoundToInt(currentATB);
+
+            if (cur != shownATB || max != shownATBMax)
+            {
+                shownATB = cur;
+                shownATBMax = max;
+                timeText.text = $"{cur}/{max}";
+            }
         }
 
         if (timeBar != null)
@@ -137,15 +158,20 @@ public class CharacterPanel : MonoBehaviour
 
         UpdateChargeBoxes();
 
-        if (atkText != null) atkText.text = $"Atk : {character.Stats.Attack:F0}";
-        if (defText != null) defText.text = $"Def : {character.Stats.Defense:F0}";
-        if (spdText != null) spdText.text = $"Spd : {character.Stats.Speed:F0}";
+        float atk = character.Stats.Attack;
+        float def = character.Stats.Defense;
+        float spd = character.Stats.Speed;
+
+        if (atkText != null && atk != shownAtk) { shownAtk = atk; atkText.text = $"Atk : {atk:F0}"; }
+        if (defText != null && def != shownDef) { shownDef = def; defText.text = $"Def : {def:F0}"; }
+        if (spdText != null && spd != shownSpd) { shownSpd = spd; spdText.text = $"Spd : {spd:F0}"; }
     }
 
     // ✅ เรียกตอน hover
     public void SetChargePreview(int deltaBoxes)
     {
-        Debug.Log($"SetChargePreview: delta={deltaBoxes} for {(character != null ? character.CharacterName : "null")}");
+        if (debugLogs)
+            Debug.Log($"SetChargePreview: delta={deltaBoxes} for {(character != null ? character.CharacterName : "null")}");
 
         previewActive = true;
         previewDeltaBoxes = deltaBoxes;
@@ -155,7 +181,8 @@ public class CharacterPanel : MonoBehaviour
     // ✅ เรียกตอนออก hover
     public void ClearChargePreview()
     {
-        Debug.Log("ClearChargePreview");
+        if (debugLogs)
+            Debug.Log("ClearChargePreview");
 
         previewActive = false;
         previewDeltaBoxes = 0;

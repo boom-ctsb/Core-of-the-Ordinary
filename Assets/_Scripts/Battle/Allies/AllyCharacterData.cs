@@ -18,17 +18,21 @@ public class AllyCharacterData : BaseCharacterData
     [Tooltip("Ultimate ของตัวละคร (แยกจาก allSkills เพราะกติกาไม่เหมือนสกิลทั่วไป)")]
     public UltimateSkillAction ultimateSkill;
 
-    [Header("Skills (Max 5, Equip 2)")]
-    [Tooltip("สกิลทั้งหมดของตัวละคร (ใส่ได้สูงสุด 5)")]
-    public SkillAction[] allSkills = new SkillAction[5];
+    public const int MaxSkills = 4;
+
+    private static readonly bool[] DefaultUnlocked = { true, true, false, false };
+
+    [Header("Skills (Max 4, Equip 2)")]
+    [Tooltip("สกิลทั้งหมดของตัวละคร (ใส่ได้สูงสุด 4)")]
+    public SkillAction[] allSkills = new SkillAction[MaxSkills];
 
     [Tooltip("สถานะปลดล็อคของแต่ละสกิลใน allSkills")]
-    public bool[] unlockedSkills = new bool[5] { true, true, true, false, false };
+    public bool[] unlockedSkills = (bool[])DefaultUnlocked.Clone();
 
-    [Tooltip("index ใน allSkills ที่ถูก equip เป็น Skill1 (0-4), -1=ไม่มี")]
+    [Tooltip("index ใน allSkills ที่ถูก equip เป็น Skill1 (0-3), -1=ไม่มี")]
     public int equippedSkill1Index = 0;
 
-    [Tooltip("index ใน allSkills ที่ถูก equip เป็น Skill2 (0-4), -1=ไม่มี")]
+    [Tooltip("index ใน allSkills ที่ถูก equip เป็น Skill2 (0-3), -1=ไม่มี")]
     public int equippedSkill2Index = 1;
 
     public SkillAction GetEquippedSkill1()
@@ -113,9 +117,9 @@ public class AllyCharacterData : BaseCharacterData
 
     private void EnsureSkillArrays()
     {
-        if (allSkills == null || allSkills.Length != 5)
+        if (allSkills == null || allSkills.Length != MaxSkills)
         {
-            SkillAction[] resized = new SkillAction[5];
+            SkillAction[] resized = new SkillAction[MaxSkills];
             if (allSkills != null)
             {
                 for (int i = 0; i < Mathf.Min(allSkills.Length, resized.Length); i++)
@@ -124,9 +128,9 @@ public class AllyCharacterData : BaseCharacterData
             allSkills = resized;
         }
 
-        if (unlockedSkills == null || unlockedSkills.Length != 5)
+        if (unlockedSkills == null || unlockedSkills.Length != MaxSkills)
         {
-            bool[] resized = new bool[5] { true, true, true, false, false };
+            bool[] resized = (bool[])DefaultUnlocked.Clone();
             if (unlockedSkills != null)
             {
                 for (int i = 0; i < Mathf.Min(unlockedSkills.Length, resized.Length); i++)

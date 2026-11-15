@@ -6,42 +6,62 @@ using UnityEngine.UI;
 /// </summary>
 public class SkillButton : MonoBehaviour
 {
-   /* [SerializeField] private Image skillIcon;
-    [SerializeField] private Image selectionHighlight; // เน้นสกิลที่เลือก
+    [SerializeField] private Image skillIcon;
+    [SerializeField] private Image selectionHighlight;
+    [SerializeField] private Image lockedOverlay;
 
     private Button button;
+    private Image buttonImage;
     private SkillAction skill;
-    private System.Action<SkillButton, SkillAction> onSkillSelected;
-    private bool isSelected = false;
+    private int skillIndex;
+    private System.Action<SkillButton> onClicked;
+    private bool isSelected;
+
+    public SkillAction Skill => skill;
+    public int SkillIndex => skillIndex;
+    public bool IsSelected => isSelected;
 
     private void Awake()
     {
-        button = GetComponent<Button>();
+        CacheComponents();
         button.onClick.AddListener(OnClick);
     }
 
-    /// <summary>
-    /// ตั้งค่าปุ่มสกิล
-    /// </summary>
-    public void Initialize(SkillAction skill, System.Action<SkillButton, SkillAction> callback)
+    private void CacheComponents()
     {
-        this.skill = skill;
-        this.onSkillSelected = callback;
-
-        // แสดงแค่รูปสกิล
-        if (skill.skillIcon != null)
-            skillIcon.sprite = skill.skillIcon;
-
-        // ซ่อน Highlight ตอนเริ่มต้น
-        SetSelected(false);
+        if (button == null) button = GetComponent<Button>();
+        if (buttonImage == null) buttonImage = GetComponent<Image>();
     }
 
     /// <summary>
-    /// เมื่อกดปุ่ม
+    /// ตั้งค่าปุ่มสกิล (index = ตำแหน่งใน AllyCharacterData.allSkills)
     /// </summary>
+    public void Initialize(SkillAction skill, int index, bool unlocked, System.Action<SkillButton> callback)
+    {
+        CacheComponents();
+
+        this.skill = skill;
+        this.skillIndex = index;
+        this.onClicked = callback;
+
+        if (skillIcon != null)
+        {
+            skillIcon.sprite = skill != null ? skill.skillIcon : null;
+            skillIcon.enabled = skill != null && skill.skillIcon != null;
+        }
+
+        bool usable = skill != null && unlocked;
+        button.interactable = usable;
+
+        if (lockedOverlay != null)
+            lockedOverlay.enabled = !usable;
+
+        SetSelected(false);
+    }
+
     private void OnClick()
     {
-        onSkillSelected?.Invoke(this, skill);
+        onClicked?.Invoke(this);
     }
 
     /// <summary>
@@ -54,10 +74,7 @@ public class SkillButton : MonoBehaviour
         if (selectionHighlight != null)
             selectionHighlight.enabled = selected;
 
-        // เปลี่ยนสีปุ่มให้มืด ถ้าเลือก
-        Image buttonImage = GetComponent<Image>();
-        buttonImage.color = selected ? new Color(0.7f, 1f, 0.7f) : Color.white;
+        if (buttonImage != null)
+            buttonImage.color = selected ? new Color(0.7f, 1f, 0.7f) : Color.white;
     }
-
-    public bool IsSelected => isSelected;*/
 }

@@ -149,10 +149,20 @@ public static class SkillExecutor
     {
         TimedBuffInstance buff = CreateBuffInstance(skill, false);
         if (buff == null)
+        {
+            // โล่ทีมเป็นโล่ถาวร (BattleManager จัดการเอง) ไม่ใช่บัฟชั่วคราว
+            if (skill.enableTeamShield)
+            {
+                ApplyPostHitAdjustments(skill, target);
+                return true;
+            }
+
             return false;
+        }
 
         target.AddTimedBuff(buff.CloneForRuntime());
-        target.AddOrRefreshOwnedBuffIcon(buff.CloneForRuntime());
+
+        // ไอคอนบัฟแสดงบน panel ของผู้ใช้สกิลเท่านั้น
         iconOwner?.AddOrRefreshOwnedBuffIcon(buff.CloneForRuntime());
         ApplyPostHitAdjustments(skill, target);
         return true;
@@ -219,13 +229,11 @@ public static class SkillExecutor
             return null;
 
         bool hasStatEffect =
-            skill.buffAttackAdd != 0f ||
-            skill.buffDefenseAdd != 0f ||
-            skill.buffSpeedAdd != 0f ||
-            skill.buffHpRegenPerSecond != 0f ||
-            skill.buffEvasionChanceAdd != 0f ||
-            skill.enableTeamFollowUpHit ||
-            skill.enableTeamShield;
+             skill.buffDefenseAdd != 0f ||
+             skill.buffSpeedAdd != 0f ||
+             skill.buffHpRegenPerSecond != 0f ||
+             skill.buffEvasionChanceAdd != 0f ||
+             skill.enableTeamFollowUpHit;
 
         if (!hasStatEffect && !isDebuff)
             return null;

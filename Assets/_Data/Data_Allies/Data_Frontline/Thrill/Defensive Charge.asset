@@ -15,7 +15,7 @@ MonoBehaviour:
   skillName: Defensive Charge
   skillIcon: {fileID: 0}
   description: 
-  buttonPrefab: {fileID: 2306983244403924727, guid: fff16cc498fe87644ad4b9b19e4daf0a, type: 3}
+  buttonPrefab: {fileID: 690100824706999722, guid: e6b525d04d559034fb7f6a84674bde2c, type: 3}
   costType: 3
   cooldownSeconds: 30
   requiredCharge: 10

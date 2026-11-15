@@ -15,7 +15,7 @@ MonoBehaviour:
   skillName: Inch Punch
   skillIcon: {fileID: 21300000, guid: e9dc53286d0cf024c82169ee151e3027, type: 3}
   description: 
-  skillType: 0
+  skillType: 3
   targetType: 0
   powerBase: 0
   attackMultiplier: 1

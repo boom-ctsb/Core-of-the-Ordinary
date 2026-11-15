@@ -4,22 +4,24 @@ using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
-/// แสดงหน้าเลือก 2 สกิล จาก 5 สกิล
+/// แสดงหน้าเลือก 2 สกิล จาก 4 สกิล (บันทึกลง equippedSkill1Index / equippedSkill2Index ของ AllyCharacterData)
 /// </summary>
 public class SkillSelectionPanel : MonoBehaviour
 {
-    /*[SerializeField] private Image portraitImage;
+    private const int RequiredSelectionCount = 2;
+
+    [SerializeField] private Image portraitImage;
     [SerializeField] private TextMeshProUGUI characterNameText;
     [SerializeField] private Transform skillButtonContainer;
     [SerializeField] private GameObject skillButtonPrefab;
-    
+
     [SerializeField] private Button confirmButton;
     [SerializeField] private TextMeshProUGUI selectedCountText; // แสดง "เลือกแล้ว: 2/2"
-    
-    private BattleCharacter currentCharacter;
-    private List<SkillButton> skillButtons = new List<SkillButton>();
-    private List<SkillAction> selectedSkills = new List<SkillAction>();
-    
+
+    private AllyCharacterData currentData;
+    private readonly List<SkillButton> skillButtons = new List<SkillButton>();
+    private readonly List<SkillButton> selectedButtons = new List<SkillButton>();
+
     private System.Action<List<SkillAction>> onSkillsConfirmed;
 
     private void Awake()
@@ -29,72 +31,104 @@ public class SkillSelectionPanel : MonoBehaviour
     }
 
     /// <summary>
-    /// เปิดหน้าเลือกสกิล
+    /// เปิดหน้าเลือกสกิลจากตัวละครในสนามรบ (ใช้ได้เฉพาะฝ่ายเรา)
     /// </summary>
     public void ShowSkillSelection(BattleCharacter character, System.Action<List<SkillAction>> callback)
     {
-        currentCharacter = character;
+        AllyCharacterData data = character != null ? character.CharacterData as AllyCharacterData : null;
+        if (data == null)
+        {
+            Debug.LogWarning("⚠️ ShowSkillSelection: ตัวละครนี้ไม่มี AllyCharacterData");
+            return;
+        }
+
+        ShowSkillSelection(data, callback);
+    }
+
+    /// <summary>
+    /// เปิดหน้าเลือกสกิลจากข้อมูลตัวละครโดยตรง
+    /// </summary>
+    public void ShowSkillSelection(AllyCharacterData data, System.Action<List<SkillAction>> callback)
+    {
+        if (data == null) return;
+
+        currentData = data;
         onSkillsConfirmed = callback;
-        selectedSkills.Clear();
+        selectedButtons.Clear();
 
-        // อัปเดต UI
-        portraitImage.sprite = character.CharacterData.portraitSprite;
-        characterNameText.text = character.CharacterName;
+        if (portraitImage != null)
+            portraitImage.sprite = data.portraitSprite;
 
-        // สร้างปุ่มสกิล
-        CreateSkillButtons(character);
+        if (characterNameText != null)
+            characterNameText.text = data.characterName;
 
-        // แสดง Panel
+        CreateSkillButtons(data);
+        PreselectEquippedSkills(data);
+
         gameObject.SetActive(true);
         UpdateSelectedCountText();
     }
 
     /// <summary>
-    /// สร้างปุ่มสกิลให้เลือก (5 สกิล)
+    /// สร้างปุ่มสกิลให้เลือก (4 สกิล)
     /// </summary>
-    private void CreateSkillButtons(BattleCharacter character)
+    private void CreateSkillButtons(AllyCharacterData data)
     {
-        // ลบปุ่มเก่า
         foreach (Transform child in skillButtonContainer)
-        {
             Destroy(child.gameObject);
-        }
+
         skillButtons.Clear();
 
-        // สร้างปุ่มใหม่
-        for (int i = 0; i < character.AvailableSkills.Count; i++)
+        for (int i = 0; i < AllyCharacterData.MaxSkills; i++)
         {
             GameObject btnObj = Instantiate(skillButtonPrefab, skillButtonContainer);
             SkillButton skillBtn = btnObj.GetComponent<SkillButton>();
 
-            skillBtn.Initialize(character.AvailableSkills[i],i,OnSkillSelected);
-
+            skillBtn.Initialize(data.GetSkillByIndexRaw(i), i, data.IsSkillUnlocked(i), OnSkillClicked);
             skillButtons.Add(skillBtn);
         }
     }
+
+    /// <summary>
+    /// ติ๊กสกิลที่ equip อยู่ตอนนี้ไว้ล่วงหน้า
+    /// </summary>
+    private void PreselectEquippedSkills(AllyCharacterData data)
+    {
+        SelectIfValid(data.equippedSkill1Index);
+
+        if (data.equippedSkill2Index != data.equippedSkill1Index)
+            SelectIfValid(data.equippedSkill2Index);
+    }
+
+    private void SelectIfValid(int index)
+    {
+        if (index < 0 || index >= skillButtons.Count) return;
+
+        SkillButton btn = skillButtons[index];
+        if (btn.Skill == null || !currentData.IsSkillUnlocked(index)) return;
+
+        selectedButtons.Add(btn);
+        btn.SetSelected(true);
+    }
+
     /// <summary>
     /// เมื่อกดสกิล - เลือกได้สูงสุด 2 สกิล
     /// </summary>
-    private void OnSkillSelected(SkillButton skillBtn, SkillAction skill)
+    private void OnSkillClicked(SkillButton skillBtn)
     {
-        if (selectedSkills.Contains(skill))
+        if (selectedButtons.Contains(skillBtn))
         {
-            // ถ้ากดอีกครั้ง = ยกเลิกเลือก
-            selectedSkills.Remove(skill);
+            selectedButtons.Remove(skillBtn);
             skillBtn.SetSelected(false);
+        }
+        else if (selectedButtons.Count < RequiredSelectionCount)
+        {
+            selectedButtons.Add(skillBtn);
+            skillBtn.SetSelected(true);
         }
         else
         {
-            // ถ้าเลือ��น้อยกว่า 2 = สามารถเลือกได้
-            if (selectedSkills.Count < 2)
-            {
-                selectedSkills.Add(skill);
-                skillBtn.SetSelected(true);
-            }
-            else
-            {
-                Debug.Log("⚠️ เลือกสกิลได้สูงสุด 2 สกิล!");
-            }
+            Debug.Log("⚠️ เลือกสกิลได้สูงสุด 2 สกิล!");
         }
 
         UpdateSelectedCountText();
@@ -105,26 +139,31 @@ public class SkillSelectionPanel : MonoBehaviour
     /// </summary>
     private void OnConfirmSkills()
     {
-        if (selectedSkills.Count < 2)
+        if (currentData == null) return;
+
+        if (selectedButtons.Count < RequiredSelectionCount)
         {
             Debug.Log("⚠️ ต้องเลือก 2 สกิล!");
             return;
         }
 
-        Debug.Log($"✅ {currentCharacter.CharacterName} เลือกสกิล: {selectedSkills[0].skillName}, {selectedSkills[1].skillName}");
-        
-        // บันทึกสกิลที่เลือก
-        currentCharacter.SelectSkills(selectedSkills);
+        SkillButton first = selectedButtons[0];
+        SkillButton second = selectedButtons[1];
 
-        // ปิด Panel
+        currentData.equippedSkill1Index = first.SkillIndex;
+        currentData.equippedSkill2Index = second.SkillIndex;
+
+        Debug.Log($"✅ {currentData.characterName} เลือกสกิล: {first.Skill.skillName}, {second.Skill.skillName}");
+
+        List<SkillAction> result = new List<SkillAction> { first.Skill, second.Skill };
+
         gameObject.SetActive(false);
-
-        // เรียก Callback
-        onSkillsConfirmed?.Invoke(selectedSkills);
+        onSkillsConfirmed?.Invoke(result);
     }
 
     private void UpdateSelectedCountText()
     {
-        selectedCountText.text = $"เลือกแล้ว: {selectedSkills.Count}/2";
-    }*/
+        if (selectedCountText != null)
+            selectedCountText.text = $"เลือกแล้ว: {selectedButtons.Count}/{RequiredSelectionCount}";
+    }
 }

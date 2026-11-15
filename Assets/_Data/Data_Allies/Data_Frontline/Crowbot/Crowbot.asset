@@ -38,8 +38,8 @@ MonoBehaviour:
   allSkills:
   - {fileID: 11400000, guid: eedae9a7780d40a46b186736c6b0d2ab, type: 2}
   - {fileID: 11400000, guid: f3d6b6b22a119024a8220ecc81c310fe, type: 2}
-  - {fileID: 11400000, guid: 643062b6b0c58aa4288db8258b690a94, type: 2}
   - {fileID: 0}
   - {fileID: 0}
+  unlockedSkills: 01010000
   equippedSkill1Index: 0
   equippedSkill2Index: 1

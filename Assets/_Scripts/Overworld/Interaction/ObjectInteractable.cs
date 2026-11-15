@@ -3,7 +3,13 @@ using UnityEngine;
 /// <summary>
 /// ติดกับ Object ในฉาก — Collect / Clue / Destroy
 /// กด Space เมื่ออยู่ใกล้ → (dialogue ถ้ามี) → Complete Task
+/// กด Space เมื่ออยู่ใกล้ → (dialogue ตามที่ตั้ง mode) → Complete Task
 /// </summary>
+public enum ObjectInteractMode
+{
+    CollectOnly,          // เก็บ/ทำเฉยๆ ไม่มี dialogue
+    DialogueThenComplete  // เล่น dialogue ให้จบก่อน แล้วค่อยนับว่าสำเร็จ
+}
 [RequireComponent(typeof(Collider2D))]
 public class ObjectInteractable : MonoBehaviour
 {
@@ -11,8 +17,10 @@ public class ObjectInteractable : MonoBehaviour
     [Tooltip("ต้องตรงกับ taskId ใน EpisodeData.tasks[]")]
     [SerializeField] private string taskId;
 
-    [Header("Dialogue (optional)")]
-    [Tooltip("ถ้าว่าง = ไม่มี dialogue, complete task ทันที")]
+    [Header("Interact Mode")]
+    [Tooltip("CollectOnly = เก็บเฉยๆ สำเร็จทันที\nDialogueThenComplete = เล่น dialogue ก่อน แล้วค่อยสำเร็จ")]
+    [SerializeField] private ObjectInteractMode mode = ObjectInteractMode.CollectOnly;
+    [Tooltip("ใช้เมื่อ mode = DialogueThenComplete")]
     [SerializeField] private DialogueData dialogueData;
 
     [Header("Behaviour หลัง Complete")]
@@ -31,6 +39,7 @@ public class ObjectInteractable : MonoBehaviour
     private bool _playerNearby = false;
     private PlayerController _playerRef = null;
     private bool _isDone = false;
+    private bool _isBusy = false;
 
     // ─────────────────────────────────────────
 
@@ -76,7 +85,7 @@ public class ObjectInteractable : MonoBehaviour
 
     private void Update()
     {
-        if (!_playerNearby || _isDone) return;
+        if (!_playerNearby || _isDone || _isBusy) return;
         if (DialogueManager.Instance != null && DialogueManager.Instance.IsPlaying) return;
         if (EpisodeManager.Instance != null && !EpisodeManager.Instance.IsExploring()) return;
 
@@ -92,9 +101,16 @@ public class ObjectInteractable : MonoBehaviour
     {
         SetHint(false);
 
-        if (dialogueData != null)
+        bool playDialogue = mode == ObjectInteractMode.DialogueThenComplete;
+        if (playDialogue && (dialogueData == null || DialogueManager.Instance == null))
         {
             // มี dialogue → เล่นก่อน แล้วค่อย complete
+            Debug.LogWarning($"[ObjectInteractable] '{name}' ตั้ง DialogueThenComplete แต่ไม่มี DialogueData/DialogueManager → complete ทันที", this);
+            playDialogue = false;
+        }
+        if (playDialogue)
+        {
+            _isBusy = true;
             DialogueManager.Instance.StartDialogue(dialogueData, _playerRef);
             StartCoroutine(CompleteAfterDialogue());
         }
@@ -117,6 +133,7 @@ public class ObjectInteractable : MonoBehaviour
 
     private void OnComplete()
     {
+        _isBusy = false;
         _isDone = true;
 
         // แจ้ง EpisodeManager

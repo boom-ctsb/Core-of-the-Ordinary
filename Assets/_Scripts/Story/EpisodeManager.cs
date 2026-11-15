@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
@@ -36,9 +37,10 @@ public class EpisodeManager : MonoBehaviour
 
     public EpisodePhase CurrentPhase { get; private set; } = EpisodePhase.Idle;
 
-    // ─────────────────────────────────────────
-    // Init
-    // ─────────────────────────────────────────
+    /// <summary>แจ้งทุกครั้งที่ความคืบหน้า task เปลี่ยน (รวมตอน reset เริ่ม EP) — static เพื่อให้ UI subscribe ได้ไม่ว่า Awake ลำดับไหน</summary>
+    public static event Action OnTaskProgressChanged;
+    public EpisodeTask[] Tasks => episodeData != null ? episodeData.tasks : Array.Empty<EpisodeTask>();
+
 
     private void Awake()
     {
@@ -55,6 +57,7 @@ public class EpisodeManager : MonoBehaviour
         }
 
         episodeData.ResetTasks();
+        OnTaskProgressChanged?.Invoke();
         StartCoroutine(EpisodeIntroRoutine());
     }
 
