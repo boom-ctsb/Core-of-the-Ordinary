@@ -5,7 +5,8 @@ public enum TaskType
     Talk,     // คุยกับตัวละคร
     Collect,  // เก็บของ
     Clue,     // สืบเบาะแส
-    Destroy   // ทำลาย
+    Destroy,  // ทำลาย
+    Goto      // ไปยังจุดที่กำหนด
 }
 
 [System.Serializable]

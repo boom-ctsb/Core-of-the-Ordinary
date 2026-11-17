@@ -2,29 +2,25 @@ using System.Text;
 using TMPro;
 using UnityEngine;
 /// <summary>
-/// แสดงความคืบหน้าภารกิจของ EP ปัจจุบัน เช่น "ตามหาของสำคัญ 1/3"
+/// แสดงภารกิจของขั้นปัจจุบัน เช่น "สำรวจบ้านร้าง 1/3" / "จัดการ Dysnorma"
+/// ข้อความมาจาก EpisodeStep.objectiveText — อัปเดตเฉพาะตอนความคืบหน้า/ขั้นเปลี่ยน ไม่ใช่ทุกเฟรม
 /// ติดกับ GameObject ที่มี TextMeshProUGUI
 /// </summary>
 public class TaskProgressUI : MonoBehaviour
 {
     [Header("UI")]
     [SerializeField] private TextMeshProUGUI progressText;
-    [Header("Filter")]
-    [Tooltip("เปิด = นับเฉพาะ task ชนิดที่เลือก (เช่น Collect)\nปิด = นับทุก task ของ EP")]
-    [SerializeField] private bool filterByType = true;
-    [SerializeField] private TaskType taskType = TaskType.Collect;
     [Header("Format")]
-    [Tooltip("{0} = ชื่อหัวข้อ, {1} = ทำแล้ว, {2} = ทั้งหมด")]
-    [SerializeField] private string format = "{0} {1}/{2}";
-    [SerializeField] private string title = "ตามหาของสำคัญ";
-    [Tooltip("ข้อความตอนครบทุกอัน (ว่าง = ใช้ format เดิม)")]
-    [SerializeField] private string completedText = "ครบแล้ว! ไปต่อที่จุดหมาย";
-    [Tooltip("แสดงรายชื่อ task แต่ละอัน พร้อมติ๊กว่าทำแล้ว")]
+    [Tooltip("{0} = ข้อความภารกิจของขั้น, {1} = ทำแล้ว, {2} = ทั้งหมด")]
+    [SerializeField] private string countFormat = "{0} {1}/{2}";
+    [Tooltip("ข้อความต่อท้ายตอน task ครบแล้วแต่ยังไม่เปลี่ยนขั้น (ว่าง = ใช้ countFormat เดิม)")]
+    [SerializeField] private string completedSuffix = "";
+    [Tooltip("แสดงรายชื่อ task ของขั้นนี้ พร้อมติ๊กว่าทำแล้ว")]
     [SerializeField] private bool showTaskList = false;
     [SerializeField] private string doneMark = "[x]";
     [SerializeField] private string todoMark = "[ ]";
-    [Tooltip("ซ่อนข้อความถ้า EP นี้ไม่มี task ตามตัวกรอง")]
-    [SerializeField] private bool hideWhenNoTasks = true;
+    [Tooltip("ซ่อนข้อความเมื่อขั้นนี้ไม่มี objectiveText / ไม่อยู่ในขั้นใดเลย")]
+    [SerializeField] private bool hideWhenEmpty = true;
     private readonly StringBuilder sb = new StringBuilder();
     private void Awake()
     {
@@ -43,38 +39,33 @@ public class TaskProgressUI : MonoBehaviour
     public void Refresh()
     {
         if (progressText == null) return;
-        EpisodeTask[] tasks = EpisodeManager.Instance != null
-            ? EpisodeManager.Instance.Tasks
-            : System.Array.Empty<EpisodeTask>();
-        int total = 0;
-        int done = 0;
-        for (int i = 0; i < tasks.Length; i++)
-        {
-            EpisodeTask t = tasks[i];
-            if (t == null) continue;
-            if (filterByType && t.taskType != taskType) continue;
-            total++;
-            if (t.isCompleted) done++;
-        }
-        if (total == 0)
+        EpisodeManager ep = EpisodeManager.Instance;
+        EpisodeStep step = ep != null ? ep.CurrentStep : null;
+        if (step == null || string.IsNullOrEmpty(step.objectiveText))
         {
             progressText.text = "";
-            progressText.enabled = !hideWhenNoTasks;
+            progressText.enabled = !hideWhenEmpty;
             return;
         }
         progressText.enabled = true;
         sb.Clear();
-        if (done >= total && !string.IsNullOrEmpty(completedText))
-            sb.Append(completedText);
-        else
-            sb.AppendFormat(format, title, done, total);
-        if (showTaskList)
+        bool counted = step.type == StepType.Explore && step.showCount;
+        if (counted)
         {
-            for (int i = 0; i < tasks.Length; i++)
+            ep.GetStepProgress(out int done, out int total);
+            sb.AppendFormat(countFormat, step.objectiveText, done, total);
+            if (done >= total && total > 0 && !string.IsNullOrEmpty(completedSuffix))
+                sb.Append(' ').Append(completedSuffix);
+        }
+        else
+        {
+            sb.Append(step.objectiveText);
+        }
+        if (showTaskList && step.tasks != null)
+        {
+            foreach (EpisodeTask t in step.tasks)
             {
-                EpisodeTask t = tasks[i];
                 if (t == null) continue;
-                if (filterByType && t.taskType != taskType) continue;
                 sb.Append('\n').Append(t.isCompleted ? doneMark : todoMark).Append(' ').Append(t.taskName);
             }
         }

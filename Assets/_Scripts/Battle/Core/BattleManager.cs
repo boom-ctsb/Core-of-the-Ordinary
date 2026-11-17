@@ -8,9 +8,16 @@ public class BattleManager : MonoBehaviour
     public static event Action<BattleCharacter> OnAllyTookDamage;
     public static event Action<BattleCharacter, SkillAction> OnAllyUsedSkill;
 
+    /// <summary>สู้จบ — true = ชนะ, false = แพ้</summary>
+    public static event Action<bool> OnBattleEnded;
+
     [Header("Factory / Party")]
     [SerializeField] private CharacterFactory characterFactory;
     [SerializeField] private string selectedEnemyName = "Dysnorma";
+
+    [Header("Story Return")]
+    [Tooltip("สู้จบแล้วรอกี่วินาทีก่อนกลับซีนเนื้อเรื่อง (ใช้เมื่อถูกเรียกจากเนื้อเรื่องเท่านั้น)")]
+    [SerializeField] private float storyReturnDelay = 2f;
 
     [Header("Dynamic Ally Panels Builder")]
     [SerializeField] private BattleAllyPanelBuilder allyPanelBuilder;
@@ -52,6 +59,8 @@ public class BattleManager : MonoBehaviour
 
     private BattleCharacter currentReadyCharacter;
     private Dysnorma enemyInstance;
+    private bool battleEnded;
+    private float endCheckTimer;
 
     private readonly List<TeamOnHitBuff> activeTeamOnHitBuffs = new List<TeamOnHitBuff>();
 
@@ -115,7 +124,11 @@ public class BattleManager : MonoBehaviour
         if (allyPanelBuilder != null)
             allyPanelBuilder.BuildFromAlliesSlots(alliesBySlots);
 
-        BattleCharacter enemy = characterFactory.CreateEnemy(selectedEnemyName);
+        string enemyName = StoryProgress.BattleActive && !string.IsNullOrEmpty(StoryProgress.EnemyName)
+            ? StoryProgress.EnemyName
+            : selectedEnemyName;
+
+        BattleCharacter enemy = characterFactory.CreateEnemy(enemyName);
         if (enemy is Dysnorma d)
         {
             enemyInstance = d;
@@ -166,9 +179,16 @@ public class BattleManager : MonoBehaviour
 
     private void Update()
     {
-        if (enemyPanel != null) enemyPanel.UpdatePanel();
+        if (battleEnded) return;
 
         TickTeamOnHitBuffs(Time.deltaTime);
+
+        endCheckTimer += Time.deltaTime;
+        if (endCheckTimer >= 0.25f)
+        {
+            endCheckTimer = 0f;
+            if (CheckBattleEnd()) return;
+        }
 
         for (int i = 0; i < allCharacters.Count; i++)
         {
@@ -196,6 +216,52 @@ public class BattleManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// ตรวจจบการสู้: ศัตรูตายหมด = ชนะ, ฝ่ายเราตายหมด = แพ้
+    /// ถ้าถูกเรียกจากเนื้อเรื่อง (StoryProgress.BattleActive) จะกลับซีนเนื้อเรื่องหลังหน่วงเวลา
+    /// </summary>
+    private bool CheckBattleEnd()
+    {
+        if (allCharacters.Count == 0) return false;
+
+        bool anyEnemy = false, anyEnemyAlive = false, anyAlly = false, anyAllyAlive = false;
+        for (int i = 0; i < allCharacters.Count; i++)
+        {
+            BattleCharacter c = allCharacters[i];
+            if (c == null || c.CharacterData == null || c.Stats == null) continue;
+
+            if (c.CharacterData.faction == CharacterFaction.Enemy)
+            {
+                anyEnemy = true;
+                if (!c.Stats.IsDead) anyEnemyAlive = true;
+            }
+            else
+            {
+                anyAlly = true;
+                if (!c.Stats.IsDead) anyAllyAlive = true;
+            }
+        }
+
+        bool won = anyEnemy && !anyEnemyAlive;
+        bool lost = anyAlly && !anyAllyAlive;
+        if (!won && !lost) return false;
+
+        battleEnded = true;
+        OnBattleEnded?.Invoke(won);
+        if (verboseLog) Debug.Log($"[BattleManager] Battle ended — won={won}");
+
+        if (StoryProgress.BattleActive)
+            StartCoroutine(ReturnToStoryAfterDelay(won));
+
+        return true;
+    }
+
+    private System.Collections.IEnumerator ReturnToStoryAfterDelay(bool won)
+    {
+        yield return new WaitForSeconds(storyReturnDelay);
+        StoryProgress.FinishBattle(won);
     }
 
     private void SyncTeamShieldUI()
