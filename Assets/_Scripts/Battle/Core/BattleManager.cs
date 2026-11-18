@@ -219,14 +219,17 @@ public class BattleManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ตรวจจบการสู้: ศัตรูตายหมด = ชนะ, ฝ่ายเราตายหมด = แพ้
+    /// ตรวจจบการสู้: ศัตรูตายหมด (หรือ HP ลดถึง % ที่เนื้อเรื่องกำหนด) = ชนะ, ฝ่ายเราตายหมด = แพ้
     /// ถ้าถูกเรียกจากเนื้อเรื่อง (StoryProgress.BattleActive) จะกลับซีนเนื้อเรื่องหลังหน่วงเวลา
     /// </summary>
     private bool CheckBattleEnd()
     {
         if (allCharacters.Count == 0) return false;
 
-        bool anyEnemy = false, anyEnemyAlive = false, anyAlly = false, anyAllyAlive = false;
+        // ศัตรู HP ลดถึง % ที่เนื้อเรื่องกำหนด = ชนะ (หนีไป) — 0 = ต้องสู้จนตาย
+        float winHpPercent = StoryProgress.BattleActive ? StoryProgress.EnemyWinHpPercent : 0f;
+
+        bool anyEnemy = false, anyEnemyFighting = false, anyAlly = false, anyAllyAlive = false;
         for (int i = 0; i < allCharacters.Count; i++)
         {
             BattleCharacter c = allCharacters[i];
@@ -235,7 +238,12 @@ public class BattleManager : MonoBehaviour
             if (c.CharacterData.faction == CharacterFaction.Enemy)
             {
                 anyEnemy = true;
-                if (!c.Stats.IsDead) anyEnemyAlive = true;
+                if (!c.Stats.IsDead)
+                {
+                    bool belowLimit = winHpPercent > 0f && c.Stats.MaxHP > 0f
+                                      && (c.Stats.CurrentHP / c.Stats.MaxHP) * 100f <= winHpPercent;
+                    if (!belowLimit) anyEnemyFighting = true;
+                }
             }
             else
             {
@@ -244,7 +252,7 @@ public class BattleManager : MonoBehaviour
             }
         }
 
-        bool won = anyEnemy && !anyEnemyAlive;
+        bool won = anyEnemy && !anyEnemyFighting;
         bool lost = anyAlly && !anyAllyAlive;
         if (!won && !lost) return false;
 

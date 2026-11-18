@@ -57,6 +57,9 @@ public class EpisodeDetailPageUI : MonoBehaviour
             return;
         }
 
+        // บอก EpisodeManager ว่าผู้เล่นเลือก EP ไหน
+        StoryProgress.SelectedEpisode = _ep;
+
         // mode = Story → Accept ในหน้าเลือกทีมจะไป StoryScene
         GameMenuFlowController.Instance.OpenTeamSelectForStory();
     }

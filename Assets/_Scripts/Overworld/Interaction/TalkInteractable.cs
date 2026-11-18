@@ -1,18 +1,28 @@
+using System.Collections;
 using UnityEngine;
 
 /// <summary>
 /// ติดกับ NPC หรือตัวละคร Playable ใน Overworld
-/// กด Space เมื่ออยู่ใกล้ → เล่น Dialogue → Complete Task
+/// trigger = PressKey (กด Space ใกล้ๆ) หรือ AutoOnEnter (เข้าใกล้แล้วเข้าฉาก Dialogue เลย)
+/// เล่น Dialogue → Complete Task (เฉพาะเมื่อ task อยู่ในขั้น Explore ปัจจุบัน)
+/// หลัง task สำเร็จ กลับมาคุยอีกจะเล่น repeatDialogueData (Repeat Beat)
 /// </summary>
 [RequireComponent(typeof(Collider2D))]
 public class TalkInteractable : MonoBehaviour
 {
     [Header("Task")]
-    [Tooltip("ต้องตรงกับ taskId ใน EpisodeData.tasks[]\nถ้าว่าง = ไม่ผูกกับ task ไหน")]
+    [Tooltip("ต้องตรงกับ taskId ใน EpisodeData (steps[].tasks[])\nถ้าว่าง = ไม่ผูกกับ task ไหน")]
     [SerializeField] private string taskId;
+
+    [Header("Trigger")]
+    [Tooltip("PressKey = เข้าใกล้แล้วกดปุ่ม\nAutoOnEnter = เข้าใกล้แล้วเข้าฉาก Dialogue ทันที (ถ้ามี task จะเล่นเฉพาะตอน task ทำได้)")]
+    [SerializeField] private InteractTrigger trigger = InteractTrigger.PressKey;
 
     [Header("Dialogue")]
     [SerializeField] private DialogueData dialogueData;
+
+    [Tooltip("Dialogue แบบ Repeat Beat — เล่นเมื่อกลับมาคุยอีกหลัง task นี้สำเร็จแล้ว (ว่าง = ไม่ตอบสนอง)\nถ้าไม่ได้ผูก task จะเล่น dialogueData ทุกครั้งตามปกติ")]
+    [SerializeField] private DialogueData repeatDialogueData;
 
     [Header("Hint UI")]
     [SerializeField] private GameObject hintUI;
@@ -25,6 +35,8 @@ public class TalkInteractable : MonoBehaviour
 
     private bool _playerNearby = false;
     private PlayerController _playerRef = null;
+    private bool _autoFired = false;
+    private bool _hintShown = false;
 
     // ─────────────────────────────────────────
 
@@ -35,7 +47,7 @@ public class TalkInteractable : MonoBehaviour
 
     private void Awake()
     {
-        SetHint(false);
+        if (hintUI != null) hintUI.SetActive(false);
     }
 
     // ─────────────────────────────────────────
@@ -49,7 +61,7 @@ public class TalkInteractable : MonoBehaviour
 
         _playerNearby = true;
         _playerRef = pc;
-        SetHint(true);
+        _autoFired = false;
     }
 
     private void OnTriggerExit2D(Collider2D other)
@@ -70,13 +82,26 @@ public class TalkInteractable : MonoBehaviour
     {
         if (!_playerNearby) return;
 
-        // ห้าม interact ถ้า dialogue กำลังเล่นอยู่
-        if (DialogueManager.Instance != null && DialogueManager.Instance.IsPlaying) return;
+        bool busy = (DialogueManager.Instance != null && DialogueManager.Instance.IsPlaying)
+                    || (UIManager.Instance != null && UIManager.Instance.IsOverlayOpen)
+                    || (EpisodeManager.Instance != null && !EpisodeManager.Instance.IsExploring());
 
-        if (UIManager.Instance != null && UIManager.Instance.IsOverlayOpen) return;
+        if (trigger == InteractTrigger.AutoOnEnter)
+        {
+            if (busy || _autoFired) return;
 
-        // ห้าม interact ถ้าไม่ได้อยู่ใน Explore phase
-        if (EpisodeManager.Instance != null && !EpisodeManager.Instance.IsExploring()) return;
+            // มี task ผูกอยู่ → เข้าฉากอัตโนมัติเฉพาะตอน task ทำได้ (กันเล่นซ้ำ/เล่นก่อนถึงขั้น)
+            if (!string.IsNullOrEmpty(taskId) && EpisodeManager.Instance != null
+                && !EpisodeManager.Instance.IsTaskAvailable(taskId))
+                return;
+
+            _autoFired = true;
+            TryInteract();
+            return;
+        }
+
+        SetHint(!busy);
+        if (busy) return;
 
         if (Input.GetKeyDown(interactKey))
             TryInteract();
@@ -89,30 +114,37 @@ public class TalkInteractable : MonoBehaviour
     private void TryInteract()
     {
         EpisodeTask task = GetTask();
+        bool canComplete = task != null && !task.isCompleted
+                           && (EpisodeManager.Instance == null || EpisodeManager.Instance.IsTaskAvailable(taskId));
 
-        // ถ้า task นี้ทำแล้ว — เล่น dialogue ซ้ำได้ แต่ไม่ complete อีก
-        bool alreadyDone = task != null && task.isCompleted;
+        SetHint(false);
 
-        if (dialogueData != null)
+        // task ทำไปแล้ว → Repeat Beat / task ของขั้นที่ยังมาไม่ถึง → ยังไม่ตอบสนอง
+        if (task != null && !canComplete)
         {
-            // มี dialogue → เล่นก่อน แล้วค่อย complete task ตอนจบ
-            SetHint(false);
+            if (task.isCompleted && repeatDialogueData != null && DialogueManager.Instance != null)
+                DialogueManager.Instance.StartDialogue(repeatDialogueData, _playerRef);
+            return;
+        }
+
+        if (dialogueData != null && DialogueManager.Instance != null)
+        {
             DialogueManager.Instance.StartDialogue(dialogueData, _playerRef);
 
-            if (!alreadyDone && task != null && task.requiresDialogue)
+            if (canComplete && task.requiresDialogue)
                 StartCoroutine(CompleteAfterDialogue());
-        }
-        else
-        {
-            // ไม่มี dialogue → complete ทันที
-            if (!alreadyDone)
+            else if (canComplete)
                 TryCompleteTask();
+        }
+        else if (canComplete)
+        {
+            TryCompleteTask();
         }
 
         if (verboseLog) Debug.Log($"[TalkInteractable] interact: {gameObject.name}, taskId='{taskId}'");
     }
 
-    private System.Collections.IEnumerator CompleteAfterDialogue()
+    private IEnumerator CompleteAfterDialogue()
     {
         yield return new WaitUntil(() =>
             DialogueManager.Instance == null || !DialogueManager.Instance.IsPlaying);
@@ -131,12 +163,13 @@ public class TalkInteractable : MonoBehaviour
     {
         if (string.IsNullOrEmpty(taskId)) return null;
         if (EpisodeManager.Instance == null) return null;
-        // ดึงจาก EpisodeData ผ่าน EpisodeManager
         return EpisodeManager.Instance.GetTask(taskId);
     }
 
     private void SetHint(bool show)
     {
+        if (_hintShown == show) return;
+        _hintShown = show;
         if (hintUI != null) hintUI.SetActive(show);
     }
 }

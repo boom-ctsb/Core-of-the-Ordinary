@@ -89,6 +89,10 @@ public class EpisodeManager : MonoBehaviour
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
 
+        // เลือก EP จากเมนูแล้ว → ใช้ตัวนั้น (ซีนเดียวรองรับได้หลาย EP) / เปิดซีนตรงๆ → ใช้ค่าใน Inspector
+        if (StoryProgress.SelectedEpisode != null)
+            episodeData = StoryProgress.SelectedEpisode;
+
         // ตัดสินใจใน Awake เพื่อให้ Interactable ที่อ่าน StoryProgress ใน Start เห็นสถานะที่ถูกต้อง
         if (episodeData != null)
         {
@@ -173,6 +177,11 @@ public class EpisodeManager : MonoBehaviour
         for (; index < steps.Length; index++)
         {
             EpisodeStep step = steps[index];
+            if (step.skipStep)
+            {
+                skipStartDialogue = false;
+                continue;
+            }
             SetCurrentStep(index);
 
             if (verboseLog) Debug.Log($"[EpisodeManager] ▶ Step {index}: '{step.stepId}' ({step.type})");
@@ -248,7 +257,7 @@ public class EpisodeManager : MonoBehaviour
         if (fadeController != null)
             yield return fadeController.FadeOutCoroutine();
 
-        battleLaunched = StoryProgress.LaunchBattle(step.battleSceneName, step.enemyName, index, pos);
+        battleLaunched = StoryProgress.LaunchBattle(step.battleSceneName, step.enemyName, index, pos, step.winWhenEnemyHpBelowPercent);
         if (!battleLaunched) yield break; // โหลดซีนสู้ไม่ได้ → ข้ามการสู้ ไม่ให้เกมค้าง
 
         yield return new WaitUntil(() => false); // รอซีนถูกโหลดทับ
@@ -318,21 +327,30 @@ public class EpisodeManager : MonoBehaviour
         if (verboseLog) Debug.Log($"[EpisodeManager] ✅ Task สำเร็จ: '{task.taskName}' ({taskId})");
     }
 
-    /// <summary>task นี้ทำได้ตอนนี้ไหม (อยู่ในขั้นปัจจุบัน + ยังไม่ทำ) — ไม่มี EpisodeManager/ไม่ระบุ id = ทำได้เสมอ</summary>
+    /// <summary>task นี้ทำได้ตอนนี้ไหม (อยู่ในขั้นปัจจุบัน + ยังไม่ทำ + ขั้นยังไม่จบ) — ไม่มี EpisodeManager/ไม่ระบุ id = ทำได้เสมอ</summary>
     public bool IsTaskAvailable(string taskId)
     {
         if (string.IsNullOrEmpty(taskId)) return true;
         EpisodeTask t = FindCurrentStepTask(taskId);
-        return t != null && !t.isCompleted;
+        return t != null && !t.isCompleted && !AreStepTasksDone(CurrentStep);
     }
 
-    /// <summary>task ของขั้นปัจจุบันครบหมดแล้วหรือยัง</summary>
+    /// <summary>task ของขั้นปัจจุบันผ่านเงื่อนไขแล้วหรือยัง (ตาม completionMode)</summary>
     public bool AreAllTasksDone() => AreStepTasksDone(CurrentStep);
 
     public void GetStepProgress(out int done, out int total)
     {
         done = 0;
         total = 0;
+
+        // AnyOne = เป้าหมายมีแค่ 1 (ทำอันไหนก็ได้) แสดงเป็น 0/1 → 1/1
+        if (CurrentStep != null && CurrentStep.completionMode == TaskCompletionMode.AnyOne)
+        {
+            total = 1;
+            done = AreStepTasksDone(CurrentStep) ? 1 : 0;
+            return;
+        }
+
         foreach (EpisodeTask t in Tasks)
         {
             if (t == null) continue;
@@ -351,6 +369,19 @@ public class EpisodeManager : MonoBehaviour
     private static bool AreStepTasksDone(EpisodeStep step)
     {
         if (step == null || step.tasks == null) return true;
+
+        if (step.completionMode == TaskCompletionMode.AnyOne)
+        {
+            bool hasTask = false;
+            foreach (EpisodeTask t in step.tasks)
+            {
+                if (t == null) continue;
+                hasTask = true;
+                if (t.isCompleted) return true;
+            }
+            return !hasTask;
+        }
+
         foreach (EpisodeTask t in step.tasks)
             if (t != null && !t.isCompleted) return false;
         return true;

@@ -2,9 +2,15 @@ using UnityEngine;
 
 public enum StepType
 {
-    Explore,   // สำรวจ: ทำ task ให้ครบ (ลำดับไหนก็ได้) แล้วไปขั้นต่อไป
+    Explore,   // สำรวจ: ทำ task ตาม completionMode แล้วไปขั้นต่อไป
     Battle,    // สู้ Dysnorma (โหลดซีน Battle แล้วกลับมา)
     Dialogue   // เล่น Dialogue ล้วนๆ (เช่น ฉากจบ EP)
+}
+
+public enum TaskCompletionMode
+{
+    RequireAll,  // ต้องทำครบทุก task
+    AnyOne       // ทำ task ใดก็ได้แค่ 1 อัน ก็ผ่านขั้น (เช่น "คุยกับ NPC" หรือ "เดินไปถึงจุด")
 }
 
 /// <summary>
@@ -18,6 +24,9 @@ public class EpisodeStep
     public string stepId;
 
     public StepType type = StepType.Explore;
+
+    [Tooltip("ติ๊ก = ข้ามขั้นนี้ไปเลย (ใช้สลับตัวเลือก เช่น 'ไปถึงแล้วไม่มีสู้' โดยไม่ต้องลบขั้นทิ้ง)")]
+    public bool skipStep = false;
 
     [Header("Objective Text")]
     [Tooltip("ข้อความภารกิจที่แสดงบนจอ เช่น 'สำรวจบ้านร้าง'")]
@@ -38,7 +47,10 @@ public class EpisodeStep
     public string spawnPointId;
 
     [Header("Explore")]
-    [Tooltip("task ของขั้นนี้ — ต้องทำครบทุกอัน (ลำดับไหนก็ได้) ถึงจะไปขั้นต่อไป\ntaskId ต้องไม่ซ้ำกันทั้ง EP")]
+    [Tooltip("RequireAll = ต้องทำครบทุก task (ลำดับไหนก็ได้)\nAnyOne = ทำ task ไหนก็ได้ 1 อัน ก็ไปขั้นต่อไป (กล่องเขียวอ่อนที่มีตัวเลือกสีเขียว/ฟ้าในผัง)")]
+    public TaskCompletionMode completionMode = TaskCompletionMode.RequireAll;
+
+    [Tooltip("task ของขั้นนี้ taskId ต้องไม่ซ้ำกันทั้ง EP")]
     public EpisodeTask[] tasks = new EpisodeTask[0];
 
     [Header("Battle")]
@@ -47,4 +59,8 @@ public class EpisodeStep
 
     [Tooltip("ชื่อศัตรูให้ CharacterFactory สร้าง (ว่าง = ใช้ค่าใน BattleManager)")]
     public string enemyName = "Dysnorma";
+
+    [Tooltip("0 = สู้จนศัตรูตาย\n30 = เมื่อ HP ศัตรูเหลือ ≤ 30% ถือว่าชนะทันที (Dysnorma หนีและทิ้งของ)")]
+    [Range(0f, 99f)]
+    public float winWhenEnemyHpBelowPercent = 0f;
 }

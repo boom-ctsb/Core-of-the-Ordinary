@@ -18,3 +18,35 @@ MonoBehaviour:
   isUnlocked: 0
   isCompleted: 0
   storyDescription: 
+  introDialogue: {fileID: 0}
+  spawnPointId: 
+  steps:
+  - stepId: 
+    type: 0
+    objectiveText: 
+    showCount: 0
+    startDialogue: {fileID: 0}
+    endDialogue: {fileID: 0}
+    spawnPointId: 
+    tasks:
+    - taskId: 
+      taskName: 
+      taskType: 0
+      requiresDialogue: 0
+    battleSceneName: 
+    enemyName: 
+  - stepId: 
+    type: 0
+    objectiveText: 
+    showCount: 0
+    startDialogue: {fileID: 0}
+    endDialogue: {fileID: 0}
+    spawnPointId: 
+    tasks: []
+    battleSceneName: 
+    enemyName: 
+  tasks:
+  - taskId: 
+    taskName: 
+    taskType: 0
+    requiresDialogue: 0
